@@ -33,25 +33,42 @@ h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;}
 .upload-zone small{color:#8aa;font-size:.82em;}
 input[type=file]{display:none;}
 
+/* Restore prompt */
+.restore-banner{margin-bottom:14px;background:#eef7f7;border:1px solid #b8d8d8;border-radius:10px;padding:11px 16px;font-size:.88em;color:#1a4a4a;display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}
+.restore-banner .rb-actions{display:flex;gap:6px;}
+.restore-banner button{padding:6px 14px;font-size:.85em;border-radius:6px;border:none;cursor:pointer;font-weight:700;font-family:inherit;}
+.restore-yes{background:#2d5a5a;color:#fff;}
+.restore-no{background:#fff;color:#5a7a7a;border:1px solid #ccc;}
+
 /* Canvas area */
 .canvas-section{display:none;}
-.mode-bar{display:flex;gap:8px;margin-bottom:10px;}
-.mode-btn{flex:1;padding:9px;border:2px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88em;color:#1a3a3a;transition:.2s;}
+.mode-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.mode-btn{flex:1;padding:9px;border:2px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88em;color:#1a3a3a;transition:.2s;min-width:90px;font-family:inherit;}
 .mode-btn.active{background:#2d5a5a;color:#fff;border-color:#2d5a5a;}
+.mode-btn.small{flex:0;padding:9px 12px;min-width:0;}
+.mode-btn.warn{color:#c0392b;border-color:#e8b4b0;}
+.mode-btn:disabled{opacity:.4;cursor:not-allowed;}
 .canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #e0e8e8;background:#222;}
 canvas{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none;-webkit-touch-callout:none;user-select:none;}
 .corner-status{background:#1a3a3a;color:#fff;padding:8px 14px;font-size:.82em;font-weight:600;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
-.corner-dots{display:flex;gap:4px;}
+.corner-dots{display:flex;gap:4px;margin-left:auto;}
 .cdot{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);}
 .cdot.placed{background:#7dcea0;border-color:#7dcea0;}
 .cdot.next{background:transparent;border-color:#f0c040;animation:pulse .8s infinite;}
+
+/* Preview action bar (Save / Share / Compare) */
+.preview-actions{display:none;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.preview-actions.show{display:flex;}
+.pa-btn{flex:1;min-width:110px;padding:10px;border:1.5px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85em;color:#1a3a3a;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
+.pa-btn:hover{background:#eef5f5;border-color:#2d5a5a;}
+.pa-btn.on{background:#2d5a5a;color:#fff;border-color:#2d5a5a;}
 
 /* Controls */
 .ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
 .ctrl-group{display:flex;flex-direction:column;gap:5px;}
 label{font-size:.78em;font-weight:700;color:#3a5a5a;text-transform:uppercase;letter-spacing:.4px;}
-input[type=number],select{padding:9px 11px;border:1.5px solid #dde;border-radius:7px;font-size:.93em;color:#222;background:#fafafa;transition:.15s;}
-input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-shadow:0 0 0 3px rgba(45,90,90,.12);}
+input[type=number],input[type=text],input[type=email],input[type=tel],select{padding:9px 11px;border:1.5px solid #dde;border-radius:7px;font-size:.93em;color:#222;background:#fafafa;transition:.15s;width:100%;font-family:inherit;}
+input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-shadow:0 0 0 3px rgba(45,90,90,.12);}
 
 /* Color picker */
 .color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
@@ -74,11 +91,14 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
 
 /* Buttons */
 .btn-row{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:14px;}
-.btn{padding:12px 16px;border:none;border-radius:8px;font-weight:700;font-size:.88em;cursor:pointer;transition:.2s;letter-spacing:.3px;text-transform:uppercase;}
+.btn{padding:12px 16px;border:none;border-radius:8px;font-weight:700;font-size:.88em;cursor:pointer;transition:.2s;letter-spacing:.3px;text-transform:uppercase;font-family:inherit;}
 .btn-primary{background:#2d5a5a;color:#fff;}
 .btn-primary:hover{background:#1a3a3a;box-shadow:0 6px 18px rgba(26,58,58,.3);}
+.btn-primary:disabled{background:#7a9a9a;cursor:wait;}
 .btn-ghost{background:#f0f2f2;color:#1a3a3a;border:1.5px solid #d8e0e0;}
 .btn-ghost:hover{background:#e4eaea;}
+.btn-link{background:none;color:#5a7a7a;border:none;padding:10px 8px 4px;font-size:.8em;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;width:100%;font-weight:600;font-family:inherit;}
+.btn-link:hover{color:#1a3a3a;text-decoration:underline;}
 
 /* Trust strip */
 .trust{margin-top:14px;background:#f0f8f4;border:1px solid #c8e6d4;border-radius:8px;padding:12px 14px;font-size:.82em;color:#2a6a4a;line-height:1.7;}
@@ -88,7 +108,42 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a3a3a;color:#fff;padding:12px 22px;border-radius:30px;font-size:.88em;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .3s;z-index:9999;pointer-events:none;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 
+/* Modal */
+.modal{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay{position:absolute;inset:0;background:rgba(20,30,30,.55);backdrop-filter:blur(2px);animation:fadeIn .2s;}
+.modal-box{position:relative;background:#fff;border-radius:14px;padding:28px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .3s;}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:#f0f2f2;border-radius:50%;font-size:1.4em;cursor:pointer;color:#5a7a7a;display:flex;align-items:center;justify-content:center;line-height:1;}
+.modal-close:hover{background:#e4eaea;}
+.modal-box h2{font-size:1.3em;color:#1a3a3a;margin-bottom:6px;}
+.modal-box p.modal-desc{color:#5a7a7a;font-size:.92em;margin-bottom:18px;line-height:1.4;}
+.modal-box .ctrl-group{margin-bottom:12px;}
+.modal-quote-mini{background:#f0f8f4;border:1px solid #c8e6d4;border-radius:7px;padding:10px 12px;font-size:.86em;margin-bottom:14px;color:#1a4a2a;line-height:1.5;}
+.modal-quote-mini strong{color:#1a3a3a;}
+
+/* Slider hint */
+.slider-hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;padding:5px 12px;border-radius:14px;font-size:.72em;letter-spacing:.4px;pointer-events:none;opacity:0;transition:opacity .35s;font-weight:600;}
+.canvas-wrap.show-hint .slider-hint{opacity:1;}
+
+/* Print sheet */
+@media print {
+  body{background:#fff;padding:0;}
+  body > *{display:none !important;}
+  body > #printSheet{display:block !important;}
+}
+#printSheet{display:none;padding:40px;max-width:800px;margin:0 auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+#printSheet h1{font-size:1.6em;color:#1a3a3a;margin-bottom:8px;}
+#printSheet .ps-tag{color:#5a7a7a;margin-bottom:24px;font-size:.95em;}
+#printSheet img{max-width:100%;border:1px solid #ccc;border-radius:8px;margin:16px 0;}
+#printSheet table{width:100%;border-collapse:collapse;margin-top:20px;}
+#printSheet td{padding:10px;border-bottom:1px solid #eee;font-size:.95em;}
+#printSheet td:first-child{color:#5a7a7a;text-transform:uppercase;font-size:.78em;letter-spacing:.4px;width:40%;}
+#printSheet .ps-total{background:#2d5a5a;color:#fff;padding:18px;border-radius:10px;margin-top:24px;text-align:center;}
+#printSheet .ps-total .pst-price{font-size:2em;font-weight:800;margin:4px 0;}
+#printSheet .ps-footer{margin-top:18px;font-size:.78em;color:#5a7a7a;text-align:center;line-height:1.5;}
+
 @keyframes fadeDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
 </style>
 </head>
@@ -102,6 +157,14 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
   </div>
   <p class="tagline">See your shutters before you buy &mdash; direct from the factory</p>
 </header>
+
+<div id="restoreBanner" class="restore-banner" style="display:none;">
+  <span>&#128190; Continue your last visualization?</span>
+  <div class="rb-actions">
+    <button class="restore-yes" id="restoreYes">Yes, restore</button>
+    <button class="restore-no" id="restoreNo">Start fresh</button>
+  </div>
+</div>
 
 <div class="main-grid">
 
@@ -123,9 +186,10 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
       <div class="mode-bar">
         <button class="mode-btn active" data-mode="markup">&#9999;&#65039; Mark Window</button>
         <button class="mode-btn" data-mode="preview">&#128065;&#65039; See Shutters</button>
-        <button class="mode-btn" id="clearMarkersBtn" style="flex:0;padding:9px 14px;color:#c0392b;border-color:#e8b4b0;" title="Clear markers and re-mark this photo">&#8634; Clear Markers</button>
+        <button class="mode-btn small" id="undoBtn" title="Undo last corner">&#8630; Undo</button>
+        <button class="mode-btn small warn" id="clearMarkersBtn" title="Clear all markers">&#8634; Clear</button>
       </div>
-      <div class="canvas-wrap">
+      <div class="canvas-wrap" id="canvasWrap">
         <div class="corner-status" id="cornerStatus">
           <span id="statusText">Tap the <strong>top-left</strong> corner of your window frame</span>
           <div class="corner-dots" id="cornerDots">
@@ -136,6 +200,12 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
           </div>
         </div>
         <canvas id="canvas"></canvas>
+        <div class="slider-hint" id="sliderHint">Drag the divider to compare before / after</div>
+      </div>
+      <div class="preview-actions" id="previewActions">
+        <button class="pa-btn on" id="toggleSliderBtn" title="Toggle before/after slider">&#8646; Compare</button>
+        <button class="pa-btn" id="saveImgBtn">&#128229; Save Image</button>
+        <button class="pa-btn" id="shareImgBtn">&#128228; Share</button>
       </div>
     </div>
 
@@ -155,12 +225,23 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
         &#128210; <strong>Estimate only.</strong> Always verify with a tape measure before ordering.
         Questions? Call us: <strong>(800) 555-0199</strong>
       </div>
-      <div class="ctrl-group">
-        <label for="mountSel">Mount Type</label>
-        <select id="mountSel">
-          <option value="inside">Inside Mount (flush in frame)</option>
-          <option value="outside">Outside Mount (covers wall)</option>
-        </select>
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <label for="mountSel">Mount Type</label>
+          <select id="mountSel">
+            <option value="inside">Inside Mount</option>
+            <option value="outside">Outside Mount</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label for="panelSel">Panels</label>
+          <select id="panelSel">
+            <option value="1">1 (single)</option>
+            <option value="2" selected>2 (bypass)</option>
+            <option value="3">3 (bifold)</option>
+            <option value="4">4 (bifold)</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -217,6 +298,8 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
       <button class="btn btn-primary" id="quoteBtn">Get Full Quote &rarr;</button>
     </div>
 
+    <button class="btn-link" id="printBtn">&#128424;&#65039; Print this quote</button>
+
     <div class="trust">
       <strong>&#127981; Factory Direct:</strong> No showroom markup, no middleman.<br>
       <strong>&#9989; Lifetime Warranty</strong> on all ShuttersDirectUSA shutters.<br>
@@ -227,6 +310,62 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
 </div><!-- .main-grid -->
 </div><!-- .container -->
 
+<!-- Contact info modal -->
+<div id="contactModal" class="modal" style="display:none;">
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <h2>Get Your Custom Quote</h2>
+    <p class="modal-desc">Tell us where to send your detailed quote &mdash; we'll follow up within one business day.</p>
+    <div class="modal-quote-mini" id="modalQuoteSummary"></div>
+    <div class="ctrl-group">
+      <label for="cName">Your Name *</label>
+      <input type="text" id="cName" placeholder="John Smith" autocomplete="name">
+    </div>
+    <div class="ctrl-group">
+      <label for="cEmail">Email *</label>
+      <input type="email" id="cEmail" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-group">
+        <label for="cPhone">Phone</label>
+        <input type="tel" id="cPhone" placeholder="(555) 123-4567" autocomplete="tel">
+      </div>
+      <div class="ctrl-group">
+        <label for="cZip">ZIP Code</label>
+        <input type="text" id="cZip" placeholder="90210" maxlength="5" autocomplete="postal-code">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="cSubmit" style="width:100%;margin-top:8px;">Send My Quote</button>
+  </div>
+</div>
+
+<!-- Print sheet (hidden until print) -->
+<div id="printSheet">
+  <h1>ShuttersDirectUSA &mdash; Shutter Quote</h1>
+  <p class="ps-tag">Direct from the factory &mdash; Lifetime warranty &mdash; Free shipping</p>
+  <img id="psImg" alt="">
+  <table>
+    <tr><td>Width</td><td id="psW"></td></tr>
+    <tr><td>Height</td><td id="psH"></td></tr>
+    <tr><td>Area</td><td id="psArea"></td></tr>
+    <tr><td>Shutter Type</td><td id="psType"></td></tr>
+    <tr><td>Louver Size</td><td id="psLouver"></td></tr>
+    <tr><td>Mount Type</td><td id="psMount"></td></tr>
+    <tr><td>Panels</td><td id="psPanels"></td></tr>
+    <tr><td>Color</td><td id="psColor"></td></tr>
+    <tr><td>Rate</td><td>$29 / sq ft</td></tr>
+  </table>
+  <div class="ps-total">
+    <div style="font-size:.85em;letter-spacing:.5px;text-transform:uppercase;opacity:.85;">Estimated Total</div>
+    <div class="pst-price" id="psPrice"></div>
+  </div>
+  <div class="ps-footer">
+    Estimate only &mdash; verify with tape measure before ordering.<br>
+    Questions? Call (800) 555-0199 or visit shuttersdirectusa.com
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -236,16 +375,37 @@ const ctx          = canvas.getContext('2d');
 const fileInput    = document.getElementById('fileInput');
 const uploadZone   = document.getElementById('uploadZone');
 const canvasSection= document.getElementById('canvasSection');
+const canvasWrap   = document.getElementById('canvasWrap');
 const statusText   = document.getElementById('statusText');
 const wInput       = document.getElementById('wInput');
 const hInput       = document.getElementById('hInput');
 const mountSel     = document.getElementById('mountSel');
+const panelSel     = document.getElementById('panelSel');
 const shutterSel   = document.getElementById('shutterSel');
 const louverSel    = document.getElementById('louverSel');
 const qPrice       = document.getElementById('qPrice');
 const qArea        = document.getElementById('qArea');
 const resetBtn     = document.getElementById('resetBtn');
 const quoteBtn     = document.getElementById('quoteBtn');
+const printBtn     = document.getElementById('printBtn');
+const undoBtn      = document.getElementById('undoBtn');
+const previewActions  = document.getElementById('previewActions');
+const saveImgBtn   = document.getElementById('saveImgBtn');
+const shareImgBtn  = document.getElementById('shareImgBtn');
+const toggleSliderBtn = document.getElementById('toggleSliderBtn');
+const restoreBanner   = document.getElementById('restoreBanner');
+const sliderHint   = document.getElementById('sliderHint');
+
+// Contact modal
+const contactModal = document.getElementById('contactModal');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalClose   = document.getElementById('modalClose');
+const cName        = document.getElementById('cName');
+const cEmail       = document.getElementById('cEmail');
+const cPhone       = document.getElementById('cPhone');
+const cZip         = document.getElementById('cZip');
+const cSubmit      = document.getElementById('cSubmit');
+const modalQuoteSummary = document.getElementById('modalQuoteSummary');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let img            = null;
@@ -253,7 +413,11 @@ let corners        = [];          // up to 4 {x,y} in canvas pixels
 let dragIdx        = -1;
 let vizMode        = 'markup';
 let shutterColor   = '#f5f5f5';
+let sliderActive   = true;        // before/after divider visible by default
+let sliderX        = 0.5;         // 0..1, fraction of canvas width
+let draggingSlider = false;
 const HIT          = 32;          // hit-radius in canvas px
+const SLIDER_HIT   = 28;          // slider handle hit-radius
 const CORNER_LABELS= ['TL','TR','BR','BL'];
 const CORNER_HINTS = [
   'Tap the <strong>top-left</strong> corner of your window frame',
@@ -263,6 +427,70 @@ const CORNER_HINTS = [
   'All 4 corners set! Switch to <strong>See Shutters</strong> &rarr;',
 ];
 const GHL_WEBHOOK  = 'https://YOUR-GHL-WEBHOOK-URL-HERE'; // ← swap this
+const STORAGE_KEY  = 'shutterviz-state-v1';
+
+// Off-screen shutter canvas (cached, re-rendered when style/color/dims change)
+let shutterCanvas  = null;
+let shutterDirty   = true;
+
+// ─── Storage ──────────────────────────────────────────────────────────────────
+// Corners are normalised to [0,1] so they survive screen-width changes.
+function saveToStorage() {
+  if (!img) return;
+  try {
+    const normCorners = corners.map(c => ({
+      x: canvas.width  ? c.x / canvas.width  : 0,
+      y: canvas.height ? c.y / canvas.height : 0,
+    }));
+    const state = {
+      imgSrc: img.src,
+      corners: normCorners,
+      w: wInput.value, h: hInput.value,
+      mount: mountSel.value, panels: panelSel.value,
+      shutter: shutterSel.value, louver: louverSel.value,
+      color: shutterColor, vizMode, sliderX, sliderActive,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { /* quota or other — silently drop */ }
+}
+
+function hasStored() { return !!localStorage.getItem(STORAGE_KEY); }
+
+function loadFromStorage() {
+  try {
+    const state = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!state) return;
+    wInput.value = state.w; hInput.value = state.h;
+    mountSel.value = state.mount; panelSel.value = state.panels || '2';
+    shutterSel.value = state.shutter; louverSel.value = state.louver;
+    shutterColor = state.color;
+    document.querySelectorAll('.color-swatch').forEach(s => {
+      s.classList.toggle('sel', s.dataset.color === shutterColor);
+    });
+    sliderX = typeof state.sliderX === 'number' ? state.sliderX : 0.5;
+    sliderActive = state.sliderActive !== false;
+    toggleSliderBtn.classList.toggle('on', sliderActive);
+
+    img = new Image();
+    img.onload = () => {
+      uploadZone.style.display = 'none';
+      canvasSection.style.display = 'block';
+      requestAnimationFrame(() => {
+        sizeCanvas();
+        corners = (state.corners || []).map(c => ({
+          x: c.x * canvas.width, y: c.y * canvas.height
+        }));
+        vizMode = state.vizMode || 'markup';
+        setModeButtons(vizMode);
+        updateCornerStatus();
+        updateQuote();
+        shutterDirty = true;
+        drawCanvas();
+      });
+    };
+    img.src = state.imgSrc;
+  } catch (e) { localStorage.removeItem(STORAGE_KEY); }
+}
 
 // ─── Upload ───────────────────────────────────────────────────────────────────
 uploadZone.addEventListener('click', () => fileInput.click());
@@ -289,14 +517,21 @@ function loadFile(file) {
     tmp.getContext('2d').drawImage(raw, 0, 0, w, h);
     img = new Image();
     img.onload = () => {
-      sizeCanvas();
+      // FIX: show canvas section BEFORE sizing so parent has correct width.
+      // Previously, sizeCanvas() ran while parent was display:none, giving
+      // offsetWidth=0 and the photo only appeared after a scroll/resize.
       corners = [];
       vizMode = 'markup';
       uploadZone.style.display = 'none';
       canvasSection.style.display = 'block';
-      setModeButtons('markup');
-      updateCornerStatus();
-      drawCanvas();
+      requestAnimationFrame(() => {
+        sizeCanvas();
+        setModeButtons('markup');
+        updateCornerStatus();
+        shutterDirty = true;
+        drawCanvas();
+        saveToStorage();
+      });
     };
     img.src = tmp.toDataURL('image/jpeg', 0.88);
   };
@@ -304,7 +539,7 @@ function loadFile(file) {
 }
 
 function sizeCanvas() {
-  const maxW = canvas.parentElement.offsetWidth;
+  const maxW = canvas.parentElement.offsetWidth || 600;
   const ratio = img.height / img.width;
   canvas.width  = maxW;
   canvas.height = Math.round(maxW * ratio);
@@ -326,39 +561,75 @@ function nearestCorner(pt) {
   return bestD < HIT ? best : -1;
 }
 
+function nearSlider(pt) {
+  if (!sliderActive || vizMode !== 'preview' || corners.length < 4) return false;
+  return Math.abs(pt.x - sliderX * canvas.width) < SLIDER_HIT;
+}
+
+function lerpPt(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
+
 // ─── Pointer events ───────────────────────────────────────────────────────────
 canvas.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 canvas.addEventListener('touchmove',  e => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 canvas.addEventListener('touchend',   e => { e.preventDefault(); handleEnd(); }, { passive: false });
 
 canvas.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
-canvas.addEventListener('mousemove', e => { if (dragIdx !== -1) handleMove(e.clientX, e.clientY); });
+canvas.addEventListener('mousemove', e => {
+  // Update cursor over the slider handle
+  if (vizMode === 'preview' && sliderActive && corners.length === 4) {
+    const pt = canvasCoords(e.clientX, e.clientY);
+    canvas.style.cursor = nearSlider(pt) ? 'ew-resize' : 'crosshair';
+  } else {
+    canvas.style.cursor = 'crosshair';
+  }
+  if (dragIdx !== -1 || draggingSlider) handleMove(e.clientX, e.clientY);
+});
 canvas.addEventListener('mouseup',   () => handleEnd());
-canvas.addEventListener('mouseleave',() => { if (dragIdx !== -1) { dragIdx = -1; drawCanvas(); } });
+canvas.addEventListener('mouseleave',() => {
+  if (dragIdx !== -1 || draggingSlider) { dragIdx = -1; draggingSlider = false; drawCanvas(); }
+});
 
 function handleStart(cx, cy) {
-  if (!img || vizMode !== 'markup') return;
+  if (!img) return;
   const pt = canvasCoords(cx, cy);
+  // Slider always wins if active and tapped near divider
+  if (vizMode === 'preview' && sliderActive && corners.length === 4 && nearSlider(pt)) {
+    draggingSlider = true;
+    sliderX = Math.max(0, Math.min(1, pt.x / canvas.width));
+    drawCanvas();
+    return;
+  }
+  if (vizMode !== 'markup') return;
   const hit = nearestCorner(pt);
   if (hit !== -1) {
     dragIdx = hit;
   } else if (corners.length < 4) {
     corners.push(pt);
-    if (corners.length === 4) estimateDimensions();
+    if (corners.length === 4) { estimateDimensions(); shutterDirty = true; }
     updateCornerStatus();
     drawCanvas();
+    saveToStorage();
   }
 }
 
 function handleMove(cx, cy) {
-  if (!img || vizMode !== 'markup' || dragIdx === -1) return;
+  if (!img) return;
+  if (draggingSlider) {
+    const pt = canvasCoords(cx, cy);
+    sliderX = Math.max(0, Math.min(1, pt.x / canvas.width));
+    drawCanvas();
+    return;
+  }
+  if (vizMode !== 'markup' || dragIdx === -1) return;
   corners[dragIdx] = canvasCoords(cx, cy);
-  if (corners.length === 4) estimateDimensions();
+  if (corners.length === 4) { estimateDimensions(); shutterDirty = true; }
   drawCanvas();
 }
 
 function handleEnd() {
+  if (dragIdx !== -1 || draggingSlider) saveToStorage();
   dragIdx = -1;
+  draggingSlider = false;
 }
 
 // ─── Corner status UI ─────────────────────────────────────────────────────────
@@ -368,25 +639,29 @@ function updateCornerStatus() {
     const d = document.getElementById('d' + i);
     d.className = 'cdot' + (i < corners.length ? ' placed' : i === corners.length ? ' next' : '');
   }
+  undoBtn.disabled = corners.length === 0;
 }
 
+undoBtn.addEventListener('click', () => {
+  if (corners.length === 0) return;
+  corners.pop();
+  shutterDirty = true;
+  updateCornerStatus();
+  drawCanvas();
+  saveToStorage();
+});
+
 // ─── Dimension estimation ─────────────────────────────────────────────────────
-// Strategy: use the window's fraction of the image width to pick a plausible
-// real-world width, then derive height from the pixel aspect ratio.
-// Standard window widths: 18, 24, 30, 36, 42, 48, 54, 60"
-// Typical phone photo: window occupies 20-70% of frame width depending on distance.
+// Use the window's fraction of image width to pick a plausible real-world
+// width, then derive height from the pixel aspect ratio.
 function estimateDimensions() {
   if (corners.length < 4) return;
   const tl = corners[0], tr = corners[1], br = corners[2], bl = corners[3];
-  const pw = (dist(tl, tr) + dist(bl, br)) / 2;  // avg pixel width
-  const ph = (dist(tl, bl) + dist(tr, br)) / 2;  // avg pixel height
-  const aspect = ph / pw;                          // height-to-width ratio
-
-  // Fraction of image the window occupies
+  const pw = (dist(tl, tr) + dist(bl, br)) / 2;
+  const ph = (dist(tl, bl) + dist(tr, br)) / 2;
+  const aspect = ph / pw;
   const frac = pw / canvas.width;
 
-  // Map fraction → estimated real width (inches)
-  // Calibrated against typical "stand back, shoot your window" photos
   let estW;
   if      (frac < 0.18) estW = 60;
   else if (frac < 0.27) estW = 48;
@@ -395,8 +670,6 @@ function estimateDimensions() {
   else if (frac < 0.67) estW = 24;
   else                  estW = 18;
 
-  // Height from pixel aspect ratio — this is the more reliable number
-  // Round to nearest 0.5"
   const estH = Math.round(estW * aspect * 2) / 2;
 
   wInput.value = Math.min(120, Math.max(6, estW));
@@ -404,9 +677,109 @@ function estimateDimensions() {
   updateQuote();
 }
 
+// ─── Perspective warp ─────────────────────────────────────────────────────────
+// Canvas 2D has no perspective transform, so we subdivide the source rectangle
+// into a grid of small quads, each rendered as 2 triangles using affine
+// transforms that map source triangle to destination triangle. With a 12x12
+// grid (288 triangles) the warp closely approximates a true homography.
+function drawTexturedTriangle(c, src, s0, s1, s2, d0, d1, d2) {
+  const denom = s0.x * (s1.y - s2.y) + s1.x * (s2.y - s0.y) + s2.x * (s0.y - s1.y);
+  if (Math.abs(denom) < 1e-8) return;
+  const a  = (d0.x * (s1.y - s2.y) + d1.x * (s2.y - s0.y) + d2.x * (s0.y - s1.y)) / denom;
+  const b  = (d0.y * (s1.y - s2.y) + d1.y * (s2.y - s0.y) + d2.y * (s0.y - s1.y)) / denom;
+  const cc = (d0.x * (s2.x - s1.x) + d1.x * (s0.x - s2.x) + d2.x * (s1.x - s0.x)) / denom;
+  const d  = (d0.y * (s2.x - s1.x) + d1.y * (s0.x - s2.x) + d2.y * (s1.x - s0.x)) / denom;
+  const e  = (d0.x * (s1.x * s2.y - s2.x * s1.y) + d1.x * (s2.x * s0.y - s0.x * s2.y) + d2.x * (s0.x * s1.y - s1.x * s0.y)) / denom;
+  const f  = (d0.y * (s1.x * s2.y - s2.x * s1.y) + d1.y * (s2.x * s0.y - s0.x * s2.y) + d2.y * (s0.x * s1.y - s1.x * s0.y)) / denom;
+
+  c.save();
+  c.beginPath();
+  c.moveTo(d0.x, d0.y);
+  c.lineTo(d1.x, d1.y);
+  c.lineTo(d2.x, d2.y);
+  c.closePath();
+  c.clip();
+  c.transform(a, b, cc, d, e, f);
+  c.drawImage(src, 0, 0);
+  c.restore();
+}
+
+function warpToQuad(src, quad, c) {
+  // quad = [tl, tr, br, bl]
+  const NX = 12, NY = 12;
+  const sw = src.width, sh = src.height;
+
+  // Pre-compute destination grid via bilinear interpolation
+  const grid = [];
+  for (let j = 0; j <= NY; j++) {
+    const v = j / NY;
+    const row = [];
+    for (let i = 0; i <= NX; i++) {
+      const u = i / NX;
+      const top = lerpPt(quad[0], quad[1], u);
+      const bot = lerpPt(quad[3], quad[2], u);
+      row.push(lerpPt(top, bot, v));
+    }
+    grid.push(row);
+  }
+
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const u0 = i / NX * sw,    u1 = (i + 1) / NX * sw;
+      const v0 = j / NY * sh,    v1 = (j + 1) / NY * sh;
+      const s00 = { x: u0, y: v0 };
+      const s10 = { x: u1, y: v0 };
+      const s11 = { x: u1, y: v1 };
+      const s01 = { x: u0, y: v1 };
+      const d00 = grid[j][i],         d10 = grid[j][i + 1];
+      const d11 = grid[j + 1][i + 1], d01 = grid[j + 1][i];
+      drawTexturedTriangle(c, src, s00, s10, s11, d00, d10, d11);
+      drawTexturedTriangle(c, src, s00, s11, s01, d00, d11, d01);
+    }
+  }
+}
+
+// ─── Off-screen shutter render ────────────────────────────────────────────────
+// Renders the full shutter unit (all panels) into an off-screen canvas at a
+// resolution proportional to the real-world dimensions. The result is then
+// warped onto the marked quadrilateral by warpToQuad().
+function renderShuttersOffscreen() {
+  const w = parseFloat(wInput.value) || 36;
+  const h = parseFloat(hInput.value) || 48;
+  const type = shutterSel.value;
+  const nPanels = type === 'sunburst' ? 1 : (parseInt(panelSel.value, 10) || 2);
+
+  const PIXEL_PER_INCH = 12;
+  const offW = Math.min(900, Math.max(120, Math.round(w * PIXEL_PER_INCH)));
+  const offH = Math.max(120, Math.round(offW * (h / w)));
+
+  if (!shutterCanvas) shutterCanvas = document.createElement('canvas');
+  shutterCanvas.width = offW;
+  shutterCanvas.height = offH;
+  const oc = shutterCanvas.getContext('2d');
+  oc.clearRect(0, 0, offW, offH);
+
+  if (type === 'arch') {
+    const panelW = offW / nPanels;
+    for (let i = 0; i < nPanels; i++) {
+      drawArchPanel(oc, i * panelW, 0, panelW, offH, shutterColor);
+    }
+  } else if (type === 'sunburst') {
+    drawSunburstPanel(oc, 0, 0, offW, offH, shutterColor);
+  } else {
+    const panelW = offW / nPanels;
+    for (let i = 0; i < nPanels; i++) {
+      drawPlantationPanel(oc, i * panelW, 0, panelW, offH, shutterColor);
+    }
+  }
+  shutterDirty = false;
+}
+
+function markShutterDirty() { shutterDirty = true; }
+
 // ─── Draw ─────────────────────────────────────────────────────────────────────
 function drawCanvas() {
-  if (!img) return;
+  if (!img || canvas.width === 0) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   if (vizMode === 'markup')   drawMarkup();
@@ -414,7 +787,6 @@ function drawCanvas() {
 }
 
 function drawMarkup() {
-  // Window outline when 4 corners set
   if (corners.length === 4) {
     ctx.save();
     ctx.strokeStyle = 'rgba(45,90,90,.65)';
@@ -422,30 +794,22 @@ function drawMarkup() {
     ctx.setLineDash([7, 5]);
     ctx.beginPath();
     corners.forEach((c, i) => i === 0 ? ctx.moveTo(c.x, c.y) : ctx.lineTo(c.x, c.y));
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(45,90,90,.07)';
-    ctx.fill();
+    ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = 'rgba(45,90,90,.07)'; ctx.fill();
     ctx.setLineDash([]);
     ctx.restore();
   }
-  // Markers
   corners.forEach((c, i) => {
-    // glow ring
     ctx.fillStyle = 'rgba(45,90,90,.18)';
     ctx.beginPath(); ctx.arc(c.x, c.y, HIT, 0, Math.PI * 2); ctx.fill();
-    // dot
     ctx.fillStyle = '#2d5a5a';
     ctx.beginPath(); ctx.arc(c.x, c.y, 9, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
-    ctx.stroke();
-    // label
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
     ctx.fillStyle = '#1a3a3a';
     ctx.font = 'bold 13px sans-serif';
     const lx = i === 1 || i === 2 ? c.x + 14 : c.x - 14;
     const ly = i < 2 ? c.y - 14 : c.y + 20;
     ctx.textAlign = (i === 1 || i === 2) ? 'left' : 'right';
-    // white halo
     ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 4;
     ctx.strokeText(CORNER_LABELS[i], lx, ly);
     ctx.fillText(CORNER_LABELS[i], lx, ly);
@@ -455,7 +819,6 @@ function drawMarkup() {
 
 function drawPreview() {
   if (corners.length < 4) {
-    // dim and prompt
     ctx.fillStyle = 'rgba(0,0,0,.62)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#fff'; ctx.font = 'bold 17px sans-serif';
@@ -465,81 +828,141 @@ function drawPreview() {
     return;
   }
 
-  const tl = corners[0], tr = corners[1], br = corners[2], bl = corners[3];
+  if (shutterDirty || !shutterCanvas) renderShuttersOffscreen();
+
   const mount = mountSel.value;
-  const type  = shutterSel.value;
-
-  // Compute bounding rect of the 4 corners
-  const xs = corners.map(c => c.x), ys = corners.map(c => c.y);
-  let x0 = Math.min(...xs), y0 = Math.min(...ys);
-  let x1 = Math.max(...xs), y1 = Math.max(...ys);
-  let sw = x1 - x0, sh = y1 - y0;
-
-  // Outside mount: expand
+  let quad = corners.slice();
+  // Outside mount: expand each corner outward from the centroid.
   if (mount === 'outside') {
-    const ex = sw * .07, ey = sh * .05;
-    x0 -= ex; y0 -= ey; sw += ex * 2; sh += ey * 2;
-    x1 = x0 + sw; y1 = y0 + sh;
+    const cx = (quad[0].x + quad[1].x + quad[2].x + quad[3].x) / 4;
+    const cy = (quad[0].y + quad[1].y + quad[2].y + quad[3].y) / 4;
+    const expand = 0.08;
+    quad = quad.map(p => ({ x: p.x + (p.x - cx) * expand, y: p.y + (p.y - cy) * expand }));
   }
 
-  // Clip to quadrilateral (perspective-correct for inside mount)
+  // Before/After slider clips the shutter render to the right of the divider
   ctx.save();
-  ctx.beginPath();
-  if (mount === 'inside') {
-    // Clip to the actual marked quad
-    ctx.moveTo(tl.x, tl.y);
-    ctx.lineTo(tr.x, tr.y);
-    ctx.lineTo(br.x, br.y);
-    ctx.lineTo(bl.x, bl.y);
-  } else {
-    // Clip to expanded bounding rect
-    ctx.rect(x0, y0, sw, sh);
+  if (sliderActive) {
+    const sx = sliderX * canvas.width;
+    ctx.beginPath();
+    ctx.rect(sx, 0, canvas.width - sx, canvas.height);
+    ctx.clip();
   }
-  ctx.closePath();
-  ctx.clip();
-
-  // Panels meet flush at center — no gap
-  const panelW = sw / 2;
-  const px0    = x0;
-  const px1    = x0 + panelW;
-
-  if (type === 'arch') {
-    drawArchPanel(ctx, px0, y0, panelW, sh, shutterColor);
-    drawArchPanel(ctx, px1, y0, panelW, sh, shutterColor);
-  } else if (type === 'sunburst') {
-    drawSunburstPanel(ctx, px0, y0, sw, sh, shutterColor);
-  } else {
-    drawPlantationPanel(ctx, px0, y0, panelW, sh, shutterColor);
-    drawPlantationPanel(ctx, px1, y0, panelW, sh, shutterColor);
-  }
-
+  warpToQuad(shutterCanvas, quad, ctx);
   ctx.restore();
 
-  // Dashed frame overlay (always shown)
+  // Dashed window frame overlay
   ctx.save();
-  const ftl = corners[0], ftr = corners[1], fbr = corners[2], fbl = corners[3];
   ctx.strokeStyle = 'rgba(255,255,255,.55)';
   ctx.lineWidth   = 2;
   ctx.setLineDash([6, 5]);
   ctx.beginPath();
-  ctx.moveTo(ftl.x, ftl.y); ctx.lineTo(ftr.x, ftr.y);
-  ctx.lineTo(fbr.x, fbr.y); ctx.lineTo(fbl.x, fbl.y);
+  ctx.moveTo(corners[0].x, corners[0].y);
+  ctx.lineTo(corners[1].x, corners[1].y);
+  ctx.lineTo(corners[2].x, corners[2].y);
+  ctx.lineTo(corners[3].x, corners[3].y);
   ctx.closePath(); ctx.stroke();
   ctx.setLineDash([]);
+  ctx.restore();
 
-  // Mount label
+  drawDimensionLabels();
+  if (sliderActive) drawSlider();
+
   if (mount === 'outside') {
+    ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,.55)';
-    const lx = x0 + sw / 2, ly = y0 - 7;
+    const mid = (corners[0].x + corners[1].x) / 2;
+    const top = Math.min(corners[0].y, corners[1].y);
     ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('OUTSIDE MOUNT', lx, ly);
+    ctx.fillText('OUTSIDE MOUNT', mid, top - 10);
+    ctx.restore();
+  }
+}
+
+function drawDimensionLabels() {
+  const w = wInput.value, h = hInput.value;
+  ctx.save();
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const padX = 6, padY = 3;
+
+  // Width label above the top edge midpoint
+  const topMid = lerpPt(corners[0], corners[1], 0.5);
+  const wLabel = w + '"';
+  const wm = ctx.measureText(wLabel);
+  ctx.fillStyle = 'rgba(26,58,58,.88)';
+  ctx.fillRect(topMid.x - wm.width/2 - padX, topMid.y - 28, wm.width + padX*2, 18);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(wLabel, topMid.x, topMid.y - 19);
+
+  // Height label to the right of the right edge midpoint
+  const rightMid = lerpPt(corners[1], corners[2], 0.5);
+  const hLabel = h + '"';
+  const hm = ctx.measureText(hLabel);
+  ctx.fillStyle = 'rgba(26,58,58,.88)';
+  ctx.fillRect(rightMid.x + 10, rightMid.y - 9, hm.width + padX*2, 18);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(hLabel, rightMid.x + 10 + padX + hm.width/2, rightMid.y);
+
+  ctx.restore();
+}
+
+// ─── Before/After slider ──────────────────────────────────────────────────────
+function drawSlider() {
+  const sx = sliderX * canvas.width;
+  const h = canvas.height;
+  ctx.save();
+  // Vertical divider line
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 4;
+  ctx.strokeStyle = 'rgba(255,255,255,.95)';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, h); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Round handle in the middle
+  const cy = h / 2;
+  const r  = 24;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(sx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#2d5a5a'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.fillStyle = '#2d5a5a';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('↔', sx, cy + 1);
+
+  // BEFORE / AFTER labels with stroke halo
+  ctx.font = 'bold 11px sans-serif';
+  ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 3;
+  ctx.fillStyle = 'rgba(255,255,255,.95)';
+  if (sx > 70) {
+    ctx.textAlign = 'right';
+    ctx.strokeText('BEFORE', sx - 14, 22);
+    ctx.fillText('BEFORE', sx - 14, 22);
+  }
+  if (sx < canvas.width - 70) {
     ctx.textAlign = 'left';
+    ctx.strokeText('AFTER', sx + 14, 22);
+    ctx.fillText('AFTER', sx + 14, 22);
   }
   ctx.restore();
 }
 
+toggleSliderBtn.addEventListener('click', () => {
+  sliderActive = !sliderActive;
+  toggleSliderBtn.classList.toggle('on', sliderActive);
+  if (sliderActive && vizMode === 'preview') flashSliderHint();
+  drawCanvas();
+  saveToStorage();
+});
+
+function flashSliderHint() {
+  canvasWrap.classList.add('show-hint');
+  setTimeout(() => canvasWrap.classList.remove('show-hint'), 2400);
+}
+
 // ─── Shutter rendering ────────────────────────────────────────────────────────
-function lv(color, pct) {           // lighten / darken
+function lv(color, pct) {           // lighten / darken hex by percent
   const n   = parseInt(color.replace('#',''), 16);
   const amt = Math.round(2.55 * pct);
   const clamp = v => Math.max(0, Math.min(255, v));
@@ -552,7 +975,6 @@ function lv(color, pct) {           // lighten / darken
 function drawPlantationPanel(c, x, y, w, h, color) {
   const louverIn = parseFloat(louverSel.value);
   const winH     = parseFloat(hInput.value) || 48;
-  // Scale louver size to canvas pixels
   const louverPx = Math.max(10, (h / winH) * louverIn);
   const stileW   = Math.max(5, Math.min(16, w * .08));
   const railH    = Math.max(6, Math.min(20, h * .055));
@@ -561,7 +983,7 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   const innerY   = y + railH;
   const innerH   = h - railH * 2;
 
-  // ── Left & right stiles (solid vertical rails) ──
+  // Stiles (vertical side rails)
   const sg = c.createLinearGradient(x, y, x + stileW, y);
   sg.addColorStop(0,   lv(color, 18));
   sg.addColorStop(0.5, lv(color, 6));
@@ -570,7 +992,7 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   c.fillRect(x,               y, stileW, h);
   c.fillRect(x + w - stileW,  y, stileW, h);
 
-  // ── Top & bottom rails ──
+  // Top and bottom rails
   const rg = c.createLinearGradient(x, y, x, y + railH);
   rg.addColorStop(0, lv(color, 14));
   rg.addColorStop(1, lv(color, -4));
@@ -578,10 +1000,11 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   c.fillRect(innerX, y,             innerW, railH);
   c.fillRect(innerX, y + h - railH, innerW, railH);
 
-  // ── Louver blades — gaps are left transparent (photo shows through) ──
+  // Louver blades. Gaps stay translucent so the photo shows through, giving
+  // the half-open look without a flat painted-on appearance.
   const nBlades  = Math.max(2, Math.round(innerH / louverPx));
   const slotH    = innerH / nBlades;
-  const openFrac = 0.32;          // 32% of slot is open gap
+  const openFrac = 0.32;
   const gapH     = slotH * openFrac;
   const bladeH   = slotH * (1 - openFrac);
 
@@ -589,7 +1012,7 @@ function drawPlantationPanel(c, x, y, w, h, color) {
     const slotY  = innerY + i * slotH;
     const bladeY = slotY + gapH;
 
-    // Shadow in the open gap (darkens the visible background, simulates depth)
+    // Translucent shadow in the open gap
     const gapGrad = c.createLinearGradient(innerX, slotY, innerX, slotY + gapH);
     gapGrad.addColorStop(0,   'rgba(0,0,0,0.30)');
     gapGrad.addColorStop(0.6, 'rgba(0,0,0,0.14)');
@@ -597,21 +1020,21 @@ function drawPlantationPanel(c, x, y, w, h, color) {
     c.fillStyle = gapGrad;
     c.fillRect(innerX, slotY, innerW, gapH);
 
-    // Blade body — gradient simulates tilt (bright front edge, shadow at back)
+    // Blade body — bright front edge, shadow at back
     const bg = c.createLinearGradient(innerX, bladeY, innerX, bladeY + bladeH);
-    bg.addColorStop(0,    lv(color, 32));   // front edge catches light
+    bg.addColorStop(0,    lv(color, 32));
     bg.addColorStop(0.12, lv(color, 14));
     bg.addColorStop(0.55, lv(color, -2));
     bg.addColorStop(0.88, lv(color, -18));
-    bg.addColorStop(1,    lv(color, -28));  // back edge in shadow
+    bg.addColorStop(1,    lv(color, -28));
     c.fillStyle = bg;
     c.fillRect(innerX, bladeY, innerW, bladeH);
 
-    // Crisp highlight on the front (top) edge of each blade
+    // Crisp front-edge highlight
     c.fillStyle = lv(color, 42);
     c.fillRect(innerX, bladeY, innerW, Math.max(1, bladeH * .06));
 
-    // Thin shadow line cast by blade onto gap below
+    // Cast shadow on the gap below this blade
     if (i < nBlades - 1) {
       const castY = slotY + slotH;
       const cast  = c.createLinearGradient(innerX, castY, innerX, castY + gapH * 0.45);
@@ -622,12 +1045,10 @@ function drawPlantationPanel(c, x, y, w, h, color) {
     }
   }
 
-  // ── Center tilt rod ──
+  // Center tilt rod
   c.save();
-  c.shadowColor = 'rgba(0,0,0,0.35)';
-  c.shadowBlur  = 3;
-  c.strokeStyle = lv(color, -32);
-  c.lineWidth   = 2.5;
+  c.shadowColor = 'rgba(0,0,0,0.35)'; c.shadowBlur = 3;
+  c.strokeStyle = lv(color, -32); c.lineWidth = 2.5;
   const cx2 = x + w / 2;
   c.beginPath();
   c.moveTo(cx2, innerY + 4);
@@ -635,19 +1056,17 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   c.stroke();
   c.restore();
 
-  // ── Panel border ──
+  // Panel border
   c.strokeStyle = lv(color, -30);
   c.lineWidth   = 2;
   c.strokeRect(x, y, w, h);
 }
 
 function drawArchPanel(c, x, y, w, h, color) {
-  // Arch: top 30% is a semicircle, bottom 70% is normal plantation
   const archH = h * .28;
   const archR = w / 2;
 
   c.save();
-  // Clip to arch shape
   c.beginPath();
   c.moveTo(x, y + archH);
   c.arc(x + w / 2, y + archH, archR, Math.PI, 0, false);
@@ -658,7 +1077,7 @@ function drawArchPanel(c, x, y, w, h, color) {
 
   drawPlantationPanel(c, x, y + archH, w, h - archH, color);
 
-  // Arch fill
+  // Arch top fill
   const ag = c.createRadialGradient(x + w / 2, y + archH, 0, x + w / 2, y + archH, archR);
   ag.addColorStop(0, lv(color, 20));
   ag.addColorStop(1, lv(color, -5));
@@ -668,18 +1087,15 @@ function drawArchPanel(c, x, y, w, h, color) {
   c.closePath();
   c.fill();
 
-  // Arch border
   c.strokeStyle = lv(color, -25);
   c.lineWidth   = 2;
   c.beginPath();
   c.arc(x + w / 2, y + archH, archR, Math.PI, 0, false);
   c.stroke();
-
   c.restore();
 }
 
 function drawSunburstPanel(c, x, y, w, h, color) {
-  // Two columns of blades fanning from a centre hub at the top
   const cx2 = x + w / 2, topY = y + h * .12;
   const nRays  = 14;
   const rayLen = Math.max(w, h) * .9;
@@ -687,23 +1103,19 @@ function drawSunburstPanel(c, x, y, w, h, color) {
   c.save();
   c.beginPath(); c.rect(x, y, w, h); c.clip();
 
-  // Background
   c.fillStyle = lv(color, -5);
   c.fillRect(x, y, w, h);
 
-  // Rays
   for (let i = 0; i <= nRays; i++) {
-    const angle = (Math.PI / nRays) * i;   // 0 → π across semicircle
+    const angle = (Math.PI / nRays) * i;
     const ex    = cx2 + Math.cos(Math.PI - angle) * rayLen;
     const ey    = topY + Math.sin(Math.PI - angle) * rayLen;
 
-    // Ray gradient
     const rg = c.createLinearGradient(cx2, topY, ex, ey);
-    rg.addColorStop(0,   lv(color, 25));
-    rg.addColorStop(.4,  lv(color, 8));
-    rg.addColorStop(1,   lv(color, -12));
+    rg.addColorStop(0,  lv(color, 25));
+    rg.addColorStop(.4, lv(color, 8));
+    rg.addColorStop(1,  lv(color, -12));
 
-    // Width of each ray blade
     const bw = rayLen * .045;
     c.save();
     c.translate(cx2, topY);
@@ -716,7 +1128,6 @@ function drawSunburstPanel(c, x, y, w, h, color) {
     c.restore();
   }
 
-  // Hub circle
   const hubR = w * .045;
   const hg   = c.createRadialGradient(cx2, topY, 0, cx2, topY, hubR);
   hg.addColorStop(0, lv(color, 40)); hg.addColorStop(1, lv(color, 0));
@@ -724,11 +1135,9 @@ function drawSunburstPanel(c, x, y, w, h, color) {
   c.beginPath(); c.arc(cx2, topY, hubR, 0, Math.PI * 2); c.fill();
   c.strokeStyle = lv(color, -30); c.lineWidth = 1.5; c.stroke();
 
-  // Frame border
   c.strokeStyle = lv(color, -25);
   c.lineWidth   = 2.5;
   c.strokeRect(x, y, w, h);
-
   c.restore();
 }
 
@@ -736,12 +1145,16 @@ function drawSunburstPanel(c, x, y, w, h, color) {
 function setModeButtons(mode) {
   vizMode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => {
+    if (!b.dataset.mode) return;
     b.classList.toggle('active', b.dataset.mode === mode);
   });
+  previewActions.classList.toggle('show', mode === 'preview');
+  if (mode === 'preview' && sliderActive && corners.length === 4) flashSliderHint();
 }
 
 document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => { setModeButtons(btn.dataset.mode); drawCanvas(); });
+  if (!btn.dataset.mode) return;
+  btn.addEventListener('click', () => { setModeButtons(btn.dataset.mode); drawCanvas(); saveToStorage(); });
 });
 
 // ─── Color picker ─────────────────────────────────────────────────────────────
@@ -750,7 +1163,9 @@ document.querySelectorAll('.color-swatch').forEach(sw => {
     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('sel'));
     sw.classList.add('sel');
     shutterColor = sw.dataset.color;
+    shutterDirty = true;
     if (vizMode === 'preview') drawCanvas();
+    saveToStorage();
   });
 });
 
@@ -765,41 +1180,167 @@ function updateQuote() {
 }
 
 [wInput, hInput].forEach(el => {
-  el.addEventListener('input',  () => { updateQuote(); if (vizMode === 'preview') drawCanvas(); });
-  el.addEventListener('change', () => { updateQuote(); if (vizMode === 'preview') drawCanvas(); });
+  el.addEventListener('input', () => {
+    updateQuote(); markShutterDirty();
+    if (vizMode === 'preview') drawCanvas();
+    saveToStorage();
+  });
 });
-[mountSel, shutterSel, louverSel].forEach(el => {
-  el.addEventListener('change', () => { updateQuote(); if (vizMode === 'preview') drawCanvas(); });
+[mountSel, panelSel, shutterSel, louverSel].forEach(el => {
+  el.addEventListener('change', () => {
+    updateQuote(); markShutterDirty();
+    if (vizMode === 'preview') drawCanvas();
+    saveToStorage();
+  });
 });
 
-// ─── Reset ────────────────────────────────────────────────────────────────────
-function doReset() {
-  img = null; corners = []; dragIdx = -1; vizMode = 'markup';
-  canvas.width = 0; canvas.height = 0;
-  fileInput.value = '';
-  canvasSection.style.display = 'none';
-  uploadZone.style.display = '';
-  wInput.value = 36; hInput.value = 48;
-  setModeButtons('markup');
-  updateCornerStatus();
-  updateQuote();
+// ─── Save & Share ─────────────────────────────────────────────────────────────
+// Builds a self-contained canvas of the current preview with a branding strip.
+function buildExportCanvas() {
+  const tmp = document.createElement('canvas');
+  tmp.width = canvas.width; tmp.height = canvas.height;
+  const tc = tmp.getContext('2d');
+  tc.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  if (corners.length === 4) {
+    if (shutterDirty || !shutterCanvas) renderShuttersOffscreen();
+    const mount = mountSel.value;
+    let quad = corners.slice();
+    if (mount === 'outside') {
+      const cx = (quad[0].x + quad[1].x + quad[2].x + quad[3].x) / 4;
+      const cy = (quad[0].y + quad[1].y + quad[2].y + quad[3].y) / 4;
+      const expand = 0.08;
+      quad = quad.map(p => ({ x: p.x + (p.x - cx) * expand, y: p.y + (p.y - cy) * expand }));
+    }
+    warpToQuad(shutterCanvas, quad, tc);
+  }
+
+  // Branding strip across the bottom
+  const stripH = Math.max(24, Math.round(tmp.height * 0.045));
+  tc.fillStyle = 'rgba(26,58,58,0.88)';
+  tc.fillRect(0, tmp.height - stripH, tmp.width, stripH);
+  tc.fillStyle = '#fff';
+  tc.font = 'bold ' + Math.round(stripH * 0.45) + 'px sans-serif';
+  tc.textAlign = 'left'; tc.textBaseline = 'middle';
+  tc.fillText('ShuttersDirectUSA', 12, tmp.height - stripH / 2);
+  tc.textAlign = 'right';
+  tc.font = Math.round(stripH * 0.4) + 'px sans-serif';
+  const w = wInput.value, h = hInput.value;
+  const typeLbl = shutterSel.options[shutterSel.selectedIndex].text;
+  tc.fillText(w + '" × ' + h + '"  •  ' + typeLbl, tmp.width - 12, tmp.height - stripH / 2);
+
+  return tmp;
 }
-resetBtn.addEventListener('click', doReset);
-document.getElementById('clearMarkersBtn').addEventListener('click', () => {
-  corners = []; dragIdx = -1; vizMode = 'markup';
-  setModeButtons('markup');
-  updateCornerStatus();
-  drawCanvas();
+
+saveImgBtn.addEventListener('click', () => {
+  if (!img) return;
+  const tmp = buildExportCanvas();
+  const link = document.createElement('a');
+  link.download = 'shutters-' + Date.now() + '.png';
+  link.href = tmp.toDataURL('image/png');
+  link.click();
+  toast('Image saved to downloads');
 });
 
-// ─── Get Quote (GHL webhook) ──────────────────────────────────────────────────
-quoteBtn.addEventListener('click', async () => {
+shareImgBtn.addEventListener('click', async () => {
+  if (!img) return;
+  const tmp = buildExportCanvas();
+  // Prefer the native Web Share API on supporting devices (mobile especially)
+  if (navigator.canShare && navigator.share) {
+    tmp.toBlob(async (blob) => {
+      const file = new File([blob], 'shutters-' + Date.now() + '.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'My new shutters',
+            text: 'Here\'s what my window will look like with new shutters from ShuttersDirectUSA',
+          });
+        } catch (e) { /* user cancelled */ }
+      } else {
+        try {
+          await navigator.share({ title: 'My new shutters', text: 'From ShuttersDirectUSA', url: location.href });
+        } catch (e) {}
+      }
+    }, 'image/png');
+  } else {
+    // Desktop fallback: just download
+    const link = document.createElement('a');
+    link.download = 'shutters-' + Date.now() + '.png';
+    link.href = tmp.toDataURL('image/png');
+    link.click();
+    toast('Image saved — share from your downloads');
+  }
+});
+
+// ─── Print quote ──────────────────────────────────────────────────────────────
+function fillPrintSheet() {
+  const w = parseFloat(wInput.value) || 0;
+  const h = parseFloat(hInput.value) || 0;
+  const sqft = (w * h) / 144;
+  const tot  = sqft * 29;
+  document.getElementById('psW').textContent = w + '"';
+  document.getElementById('psH').textContent = h + '"';
+  document.getElementById('psArea').textContent = sqft.toFixed(2) + ' sq ft';
+  document.getElementById('psType').textContent = shutterSel.options[shutterSel.selectedIndex].text;
+  document.getElementById('psLouver').textContent = louverSel.options[louverSel.selectedIndex].text;
+  document.getElementById('psMount').textContent = mountSel.options[mountSel.selectedIndex].text;
+  document.getElementById('psPanels').textContent = panelSel.options[panelSel.selectedIndex].text;
+  const sel = document.querySelector('.color-swatch.sel');
+  document.getElementById('psColor').textContent = (sel && sel.title) || shutterColor;
+  document.getElementById('psPrice').textContent = '$' + Math.round(tot).toLocaleString();
+
+  const psImg = document.getElementById('psImg');
+  if (img) {
+    psImg.src = buildExportCanvas().toDataURL('image/jpeg', 0.9);
+    psImg.style.display = '';
+  } else {
+    psImg.style.display = 'none';
+  }
+}
+
+printBtn.addEventListener('click', () => {
+  fillPrintSheet();
+  setTimeout(() => window.print(), 60);
+});
+
+// ─── Contact modal ────────────────────────────────────────────────────────────
+function openContactModal() {
+  const w = parseFloat(wInput.value) || 0;
+  const h = parseFloat(hInput.value) || 0;
+  const sqft = ((w * h) / 144).toFixed(2);
+  const tot  = Math.round((w * h / 144) * 29);
+  const typeLbl = shutterSel.options[shutterSel.selectedIndex].text;
+  modalQuoteSummary.innerHTML =
+    '<strong>' + typeLbl + '</strong> — ' + w + '" × ' + h + '" (' + sqft + ' sq ft)<br>' +
+    'Estimated total: <strong>$' + tot.toLocaleString() + '</strong>';
+  contactModal.style.display = 'flex';
+  setTimeout(() => cName.focus(), 60);
+}
+
+function closeContactModal() { contactModal.style.display = 'none'; }
+modalClose.addEventListener('click', closeContactModal);
+modalOverlay.addEventListener('click', closeContactModal);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && contactModal.style.display !== 'none') closeContactModal();
+});
+
+cSubmit.addEventListener('click', async () => {
+  const name  = cName.value.trim();
+  const email = cEmail.value.trim();
+  if (!name)  { cName.focus();  toast('Please enter your name');  return; }
+  if (!email || !email.includes('@')) { cEmail.focus(); toast('Please enter a valid email'); return; }
+
   const w    = parseFloat(wInput.value);
   const h    = parseFloat(hInput.value);
   const sqft = ((w * h) / 144).toFixed(2);
   const tot  = Math.round((w * h / 144) * 29);
 
+  cSubmit.disabled = true; cSubmit.textContent = 'Sending…';
   const payload = {
+    name, email,
+    phone:        cPhone.value.trim(),
+    zip:          cZip.value.trim(),
     width_in:     w,
     height_in:    h,
     sq_ft:        sqft,
@@ -807,6 +1348,7 @@ quoteBtn.addEventListener('click', async () => {
     shutter_type: shutterSel.value,
     louver_size:  louverSel.value,
     mount_type:   mountSel.value,
+    panels:       panelSel.value,
     color:        shutterColor,
     source:       'shutter-visualizer',
     timestamp:    new Date().toISOString(),
@@ -819,11 +1361,43 @@ quoteBtn.addEventListener('click', async () => {
       body:    JSON.stringify(payload),
       mode:    'no-cors',
     });
-    toast('Quote sent! We\'ll be in touch shortly.');
-  } catch {
-    // no-cors always throws — treat as success unless truly unreachable
-    toast('Quote submitted! We\'ll be in touch.');
-  }
+  } catch { /* no-cors always throws */ }
+
+  cSubmit.disabled = false; cSubmit.textContent = 'Send My Quote';
+  closeContactModal();
+  toast('Quote sent! We\'ll be in touch shortly.');
+});
+
+quoteBtn.addEventListener('click', openContactModal);
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+function doReset() {
+  img = null; corners = []; dragIdx = -1; vizMode = 'markup';
+  canvas.width = 0; canvas.height = 0;
+  fileInput.value = '';
+  canvasSection.style.display = 'none';
+  uploadZone.style.display = '';
+  wInput.value = 36; hInput.value = 48;
+  mountSel.value = 'inside'; panelSel.value = '2';
+  shutterSel.value = 'plantation'; louverSel.value = '3.5';
+  shutterColor = '#f5f5f5';
+  document.querySelectorAll('.color-swatch').forEach((s, i) => s.classList.toggle('sel', i === 0));
+  shutterDirty = true;
+  sliderActive = true; sliderX = 0.5;
+  toggleSliderBtn.classList.add('on');
+  setModeButtons('markup');
+  updateCornerStatus();
+  updateQuote();
+  localStorage.removeItem(STORAGE_KEY);
+}
+resetBtn.addEventListener('click', doReset);
+document.getElementById('clearMarkersBtn').addEventListener('click', () => {
+  corners = []; dragIdx = -1; vizMode = 'markup';
+  shutterDirty = true;
+  setModeButtons('markup');
+  updateCornerStatus();
+  drawCanvas();
+  saveToStorage();
 });
 
 // ─── Toast helper ─────────────────────────────────────────────────────────────
@@ -839,19 +1413,34 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     if (!img) return;
+    // Scale stored corner positions proportionally to the new canvas size
+    const oldW = canvas.width, oldH = canvas.height;
     sizeCanvas();
-    // Scale existing corners proportionally
-    const newW = canvas.width;
-    const oldW = img.width;  // original always available
-    // We stored coords in canvas pixels; re-ratio after resize
-    // Actually we need to preserve the old canvas size before resize
-    // Simple approach: clear corners and ask user to redo if image present
+    if (oldW > 0 && oldH > 0) {
+      const sx = canvas.width / oldW, sy = canvas.height / oldH;
+      corners = corners.map(c => ({ x: c.x * sx, y: c.y * sy }));
+    }
     drawCanvas();
   }, 120);
 });
 
+// ─── Restore-on-load prompt ───────────────────────────────────────────────────
+if (hasStored()) {
+  restoreBanner.style.display = 'flex';
+  document.getElementById('restoreYes').addEventListener('click', () => {
+    restoreBanner.style.display = 'none';
+    loadFromStorage();
+  });
+  document.getElementById('restoreNo').addEventListener('click', () => {
+    restoreBanner.style.display = 'none';
+    localStorage.removeItem(STORAGE_KEY);
+  });
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
+updateCornerStatus();
 updateQuote();
+toggleSliderBtn.classList.toggle('on', sliderActive);
 </script>
 </body>
 </html>
