@@ -123,7 +123,7 @@ input[type=number]:focus,select:focus{outline:none;border-color:#2d5a5a;backgrou
       <div class="mode-bar">
         <button class="mode-btn active" data-mode="markup">&#9999;&#65039; Mark Window</button>
         <button class="mode-btn" data-mode="preview">&#128065;&#65039; See Shutters</button>
-        <button class="mode-btn" id="startOverCanvas" style="flex:0;padding:9px 14px;color:#c0392b;border-color:#e8b4b0;" title="Clear photo and start over">&#8634; Start Over</button>
+        <button class="mode-btn" id="clearMarkersBtn" style="flex:0;padding:9px 14px;color:#c0392b;border-color:#e8b4b0;" title="Clear markers and re-mark this photo">&#8634; Clear Markers</button>
       </div>
       <div class="canvas-wrap">
         <div class="corner-status" id="cornerStatus">
@@ -785,7 +785,12 @@ function doReset() {
   updateQuote();
 }
 resetBtn.addEventListener('click', doReset);
-document.getElementById('startOverCanvas').addEventListener('click', doReset);
+document.getElementById('clearMarkersBtn').addEventListener('click', () => {
+  corners = []; dragIdx = -1; vizMode = 'markup';
+  setModeButtons('markup');
+  updateCornerStatus();
+  drawCanvas();
+});
 
 // ─── Get Quote (GHL webhook) ──────────────────────────────────────────────────
 quoteBtn.addEventListener('click', async () => {
