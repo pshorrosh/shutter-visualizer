@@ -33,6 +33,21 @@ h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;}
 .upload-zone small{color:#8aa;font-size:.82em;}
 input[type=file]{display:none;}
 
+/* Camera capture button — shown on touch devices */
+.camera-btn{display:none;margin-top:14px;padding:10px 18px;border:1.5px solid #c0d4d4;background:#fff;color:#2d5a5a;border-radius:8px;font-weight:600;cursor:pointer;font-size:.9em;font-family:inherit;transition:.2s;}
+.camera-btn:hover,.camera-btn:active{background:#eef5f5;border-color:#2d5a5a;}
+@media (pointer:coarse){.camera-btn{display:inline-block;}}
+
+/* Range slider (Louver Tilt) */
+.tilt-range{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:linear-gradient(to right,#1a3a3a,#7ab8b8);border-radius:3px;outline:none;border:none;padding:0;}
+.tilt-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;background:#fff;border:2.5px solid #2d5a5a;border-radius:50%;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.tilt-range::-moz-range-thumb{width:22px;height:22px;background:#fff;border:2.5px solid #2d5a5a;border-radius:50%;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+#tiltLabel{color:#2d5a5a;font-weight:600;text-transform:none;letter-spacing:0;font-size:.86em;}
+
+/* Magnifier loupe — appears while placing/dragging a corner */
+#loupe{position:absolute;width:120px;height:120px;border:3px solid #fff;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,.45);background:#222;display:none;pointer-events:none;z-index:5;}
+#loupe.show{display:block;}
+
 /* Restore prompt */
 .restore-banner{margin-bottom:14px;background:#eef7f7;border:1px solid #b8d8d8;border-radius:10px;padding:11px 16px;font-size:.88em;color:#1a4a4a;display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;}
 .restore-banner .rb-actions{display:flex;gap:6px;}
@@ -180,6 +195,8 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
       <p>Click or drag-and-drop your window photo</p>
       <small>PNG, JPG, HEIC &mdash; any size</small>
       <input type="file" id="fileInput" accept="image/*">
+      <button class="camera-btn" id="cameraBtn" type="button">&#128247; Take Photo</button>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment">
     </div>
 
     <div class="canvas-section" id="canvasSection">
@@ -200,6 +217,7 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
           </div>
         </div>
         <canvas id="canvas"></canvas>
+        <canvas id="loupe" width="120" height="120"></canvas>
         <div class="slider-hint" id="sliderHint">Drag the divider to compare before / after</div>
       </div>
       <div class="preview-actions" id="previewActions">
@@ -214,11 +232,11 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
       <div class="ctrl-row">
         <div class="ctrl-group">
           <label for="wInput">Width (inches)</label>
-          <input type="number" id="wInput" min="6" max="120" value="36" step="0.5">
+          <input type="number" id="wInput" min="6" max="120" value="36" step="0.5" inputmode="decimal">
         </div>
         <div class="ctrl-group">
           <label for="hInput">Height (inches)</label>
-          <input type="number" id="hInput" min="6" max="120" value="48" step="0.5">
+          <input type="number" id="hInput" min="6" max="120" value="48" step="0.5" inputmode="decimal">
         </div>
       </div>
       <div style="background:#fffbea;border:1px solid #f0c674;border-radius:7px;padding:9px 12px;font-size:.8em;color:#7a5a14;line-height:1.5;margin-bottom:12px;">
@@ -266,6 +284,11 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
         <option value="3.5" selected>3.5&quot; &mdash; Traditional</option>
         <option value="4.5">4.5&quot; &mdash; Bold Statement</option>
       </select>
+    </div>
+
+    <div class="ctrl-group" style="margin-bottom:14px;">
+      <label for="tiltInput">Louver Tilt &mdash; <span id="tiltLabel">Half Open</span></label>
+      <input type="range" id="tiltInput" min="0" max="100" value="32" class="tilt-range">
     </div>
 
     <div class="ctrl-group">
@@ -333,7 +356,7 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
       </div>
       <div class="ctrl-group">
         <label for="cZip">ZIP Code</label>
-        <input type="text" id="cZip" placeholder="90210" maxlength="5" autocomplete="postal-code">
+        <input type="text" id="cZip" placeholder="90210" maxlength="5" autocomplete="postal-code" inputmode="numeric">
       </div>
     </div>
     <button class="btn btn-primary" id="cSubmit" style="width:100%;margin-top:8px;">Send My Quote</button>
@@ -395,6 +418,12 @@ const shareImgBtn  = document.getElementById('shareImgBtn');
 const toggleSliderBtn = document.getElementById('toggleSliderBtn');
 const restoreBanner   = document.getElementById('restoreBanner');
 const sliderHint   = document.getElementById('sliderHint');
+const cameraBtn    = document.getElementById('cameraBtn');
+const cameraInput  = document.getElementById('cameraInput');
+const tiltInput    = document.getElementById('tiltInput');
+const tiltLabel    = document.getElementById('tiltLabel');
+const loupe        = document.getElementById('loupe');
+const loupeCtx     = loupe.getContext('2d');
 
 // Contact modal
 const contactModal = document.getElementById('contactModal');
@@ -416,8 +445,12 @@ let shutterColor   = '#f5f5f5';
 let sliderActive   = true;        // before/after divider visible by default
 let sliderX        = 0.5;         // 0..1, fraction of canvas width
 let draggingSlider = false;
+let louverTilt     = 0.32;        // 0=closed, 1=fully open (fraction of slot that is gap)
+let activeTouch    = false;       // true while a placement/drag/slider touch is in progress
 const HIT          = 32;          // hit-radius in canvas px
 const SLIDER_HIT   = 28;          // slider handle hit-radius
+const LOUPE_R      = 60;          // loupe radius in screen px (half of 120)
+const LOUPE_ZOOM   = 3;           // magnification factor
 const CORNER_LABELS= ['TL','TR','BR','BL'];
 const CORNER_HINTS = [
   'Tap the <strong>top-left</strong> corner of your window frame',
@@ -448,6 +481,7 @@ function saveToStorage() {
       w: wInput.value, h: hInput.value,
       mount: mountSel.value, panels: panelSel.value,
       shutter: shutterSel.value, louver: louverSel.value,
+      tilt: louverTilt,
       color: shutterColor, vizMode, sliderX, sliderActive,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -463,6 +497,9 @@ function loadFromStorage() {
     wInput.value = state.w; hInput.value = state.h;
     mountSel.value = state.mount; panelSel.value = state.panels || '2';
     shutterSel.value = state.shutter; louverSel.value = state.louver;
+    louverTilt = typeof state.tilt === 'number' ? state.tilt : 0.32;
+    tiltInput.value = Math.round(louverTilt * 100);
+    updateTiltLabel();
     shutterColor = state.color;
     document.querySelectorAll('.color-swatch').forEach(s => {
       s.classList.toggle('sel', s.dataset.color === shutterColor);
@@ -501,6 +538,11 @@ uploadZone.addEventListener('drop', e => {
   if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
 fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+
+// Camera capture (mobile): a separate <input capture="environment"> opens the
+// rear camera directly on phones. Hidden on desktop via the .camera-btn CSS rule.
+cameraBtn.addEventListener('click', e => { e.stopPropagation(); cameraInput.click(); });
+cameraInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
 function loadFile(file) {
   // Downsample large photos immediately so canvas operations stay fast
@@ -568,6 +610,54 @@ function nearSlider(pt) {
 
 function lerpPt(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
 
+// ─── Magnifier loupe ──────────────────────────────────────────────────────────
+// Renders a circular, zoomed-in view of the area around the active touch so the
+// user can place corners precisely on phones (where a fingertip covers ~40px).
+function showLoupe(pt) {
+  if (vizMode !== 'markup' || !img) return;
+  const rect = canvas.getBoundingClientRect();
+  const screenX = (pt.x / canvas.width)  * rect.width;
+  const screenY = (pt.y / canvas.height) * rect.height;
+  // Position loupe above the touch; flip below if it would clip the top
+  let left = screenX - LOUPE_R;
+  let top  = screenY - LOUPE_R - 130;
+  if (top  < 6) top  = screenY + 70;
+  if (left < 6) left = 6;
+  if (left + 120 > rect.width) left = rect.width - 126;
+  loupe.style.left = left + 'px';
+  loupe.style.top  = top  + 'px';
+  loupe.classList.add('show');
+
+  // Sample a square around pt on the main canvas and zoom it
+  const srcSize = 120 / LOUPE_ZOOM;
+  const sx = pt.x - srcSize / 2;
+  const sy = pt.y - srcSize / 2;
+  loupeCtx.clearRect(0, 0, 120, 120);
+  loupeCtx.imageSmoothingEnabled = false;
+  loupeCtx.drawImage(canvas, sx, sy, srcSize, srcSize, 0, 0, 120, 120);
+  // Crosshair showing the exact placement
+  loupeCtx.strokeStyle = '#f0c040'; loupeCtx.lineWidth = 2;
+  loupeCtx.beginPath();
+  loupeCtx.moveTo(60, 48); loupeCtx.lineTo(60, 72);
+  loupeCtx.moveTo(48, 60); loupeCtx.lineTo(72, 60);
+  loupeCtx.stroke();
+  loupeCtx.fillStyle = '#f0c040';
+  loupeCtx.beginPath(); loupeCtx.arc(60, 60, 2.2, 0, Math.PI * 2); loupeCtx.fill();
+}
+function hideLoupe() { loupe.classList.remove('show'); }
+
+// ─── Louver tilt label ────────────────────────────────────────────────────────
+function updateTiltLabel() {
+  const pct = Math.round(louverTilt * 100);
+  let txt;
+  if      (pct <= 8)  txt = 'Fully Closed';
+  else if (pct <= 22) txt = 'Mostly Closed';
+  else if (pct <= 40) txt = 'Half Open';
+  else if (pct <= 60) txt = 'Open';
+  else                txt = 'Wide Open';
+  tiltLabel.textContent = txt;
+}
+
 // ─── Pointer events ───────────────────────────────────────────────────────────
 canvas.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 canvas.addEventListener('touchmove',  e => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
@@ -595,18 +685,24 @@ function handleStart(cx, cy) {
   // Slider always wins if active and tapped near divider
   if (vizMode === 'preview' && sliderActive && corners.length === 4 && nearSlider(pt)) {
     draggingSlider = true;
+    activeTouch = true;
     sliderX = Math.max(0, Math.min(1, pt.x / canvas.width));
-    drawCanvas();
+    drawCanvas(true);
     return;
   }
   if (vizMode !== 'markup') return;
   const hit = nearestCorner(pt);
   if (hit !== -1) {
     dragIdx = hit;
+    activeTouch = true;
+    showLoupe(pt);
   } else if (corners.length < 4) {
     corners.push(pt);
-    if (corners.length === 4) { estimateDimensions(); shutterDirty = true; }
+    dragIdx = corners.length - 1;       // treat the just-placed corner as actively dragged
+    activeTouch = true;
+    if (corners.length === 4) { estimateDimensions(); shutterDirty = true; setSmartSliderPosition(); }
     updateCornerStatus();
+    showLoupe(pt);
     drawCanvas();
     saveToStorage();
   }
@@ -617,19 +713,28 @@ function handleMove(cx, cy) {
   if (draggingSlider) {
     const pt = canvasCoords(cx, cy);
     sliderX = Math.max(0, Math.min(1, pt.x / canvas.width));
-    drawCanvas();
+    drawCanvas(true);
     return;
   }
   if (vizMode !== 'markup' || dragIdx === -1) return;
-  corners[dragIdx] = canvasCoords(cx, cy);
+  const pt = canvasCoords(cx, cy);
+  corners[dragIdx] = pt;
   if (corners.length === 4) { estimateDimensions(); shutterDirty = true; }
+  showLoupe(pt);
   drawCanvas();
 }
 
 function handleEnd() {
-  if (dragIdx !== -1 || draggingSlider) saveToStorage();
+  const wasInteracting = dragIdx !== -1 || draggingSlider;
   dragIdx = -1;
   draggingSlider = false;
+  activeTouch = false;
+  hideLoupe();
+  if (wasInteracting) {
+    saveToStorage();
+    // Final crisp render at full warp resolution
+    drawCanvas();
+  }
 }
 
 // ─── Corner status UI ─────────────────────────────────────────────────────────
@@ -704,9 +809,11 @@ function drawTexturedTriangle(c, src, s0, s1, s2, d0, d1, d2) {
   c.restore();
 }
 
-function warpToQuad(src, quad, c) {
+function warpToQuad(src, quad, c, fast) {
   // quad = [tl, tr, br, bl]
-  const NX = 12, NY = 12;
+  // Use a coarser grid during interactive drag for smoothness; full-res on release.
+  const N = fast ? 6 : 12;
+  const NX = N, NY = N;
   const sw = src.width, sh = src.height;
 
   // Pre-compute destination grid via bilinear interpolation
@@ -778,12 +885,12 @@ function renderShuttersOffscreen() {
 function markShutterDirty() { shutterDirty = true; }
 
 // ─── Draw ─────────────────────────────────────────────────────────────────────
-function drawCanvas() {
+function drawCanvas(fast) {
   if (!img || canvas.width === 0) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   if (vizMode === 'markup')   drawMarkup();
-  else                        drawPreview();
+  else                        drawPreview(fast);
 }
 
 function drawMarkup() {
@@ -817,7 +924,7 @@ function drawMarkup() {
   });
 }
 
-function drawPreview() {
+function drawPreview(fast) {
   if (corners.length < 4) {
     ctx.fillStyle = 'rgba(0,0,0,.62)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -848,7 +955,7 @@ function drawPreview() {
     ctx.rect(sx, 0, canvas.width - sx, canvas.height);
     ctx.clip();
   }
-  warpToQuad(shutterCanvas, quad, ctx);
+  warpToQuad(shutterCanvas, quad, ctx, fast);
   ctx.restore();
 
   // Dashed window frame overlay
@@ -961,6 +1068,16 @@ function flashSliderHint() {
   setTimeout(() => canvasWrap.classList.remove('show-hint'), 2400);
 }
 
+// Place the slider on the opposite side of the photo from the window so the
+// user sees both BEFORE (their bare window) and AFTER (with shutters) at once.
+function setSmartSliderPosition() {
+  if (corners.length < 4 || !canvas.width) return;
+  const winCx = (corners[0].x + corners[1].x + corners[2].x + corners[3].x) / 4;
+  const t = winCx / canvas.width;        // window centroid X, 0..1
+  // Slider opposite the window, clamped to [0.25, 0.75] so it stays usable
+  sliderX = Math.max(0.25, Math.min(0.75, 1 - t));
+}
+
 // ─── Shutter rendering ────────────────────────────────────────────────────────
 function lv(color, pct) {           // lighten / darken hex by percent
   const n   = parseInt(color.replace('#',''), 16);
@@ -1004,7 +1121,8 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   // the half-open look without a flat painted-on appearance.
   const nBlades  = Math.max(2, Math.round(innerH / louverPx));
   const slotH    = innerH / nBlades;
-  const openFrac = 0.32;
+  // openFrac driven by the louver-tilt slider (state var louverTilt, 0..1)
+  const openFrac = Math.max(0.02, Math.min(0.85, louverTilt));
   const gapH     = slotH * openFrac;
   const bladeH   = slotH * (1 - openFrac);
 
@@ -1193,6 +1311,17 @@ function updateQuote() {
     saveToStorage();
   });
 });
+// Louver-tilt slider: change is cheap (just re-render); use 'input' for live feedback
+tiltInput.addEventListener('input', () => {
+  louverTilt = parseInt(tiltInput.value, 10) / 100;
+  updateTiltLabel();
+  markShutterDirty();
+  if (vizMode === 'preview') drawCanvas(true);
+  saveToStorage();
+});
+tiltInput.addEventListener('change', () => {
+  if (vizMode === 'preview') drawCanvas();  // final crisp render
+});
 
 // ─── Save & Share ─────────────────────────────────────────────────────────────
 // Builds a self-contained canvas of the current preview with a branding strip.
@@ -1380,6 +1509,7 @@ function doReset() {
   wInput.value = 36; hInput.value = 48;
   mountSel.value = 'inside'; panelSel.value = '2';
   shutterSel.value = 'plantation'; louverSel.value = '3.5';
+  louverTilt = 0.32; tiltInput.value = 32; updateTiltLabel();
   shutterColor = '#f5f5f5';
   document.querySelectorAll('.color-swatch').forEach((s, i) => s.classList.toggle('sel', i === 0));
   shutterDirty = true;
@@ -1390,10 +1520,11 @@ function doReset() {
   updateQuote();
   localStorage.removeItem(STORAGE_KEY);
 }
-resetBtn.addEventListener('click', doReset);
+resetBtn.addEventListener('click', () => { hideLoupe(); doReset(); });
 document.getElementById('clearMarkersBtn').addEventListener('click', () => {
   corners = []; dragIdx = -1; vizMode = 'markup';
   shutterDirty = true;
+  hideLoupe();
   setModeButtons('markup');
   updateCornerStatus();
   drawCanvas();
@@ -1440,6 +1571,7 @@ if (hasStored()) {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 updateCornerStatus();
 updateQuote();
+updateTiltLabel();
 toggleSliderBtn.classList.toggle('on', sliderActive);
 </script>
 </body>
