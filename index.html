@@ -11,9 +11,10 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f2f4f4;
 
 /* Header */
 header{text-align:center;padding:24px 0 28px;animation:fadeDown .5s ease;}
-.logo-line{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;}
-h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;}
-.badge{background:#2d5a5a;color:#fff;font-size:.65em;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;vertical-align:middle;}
+.logo-line{display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;line-height:1;}
+.badge-line{text-align:center;margin-bottom:8px;}
+.badge{background:#2d5a5a;color:#fff;font-size:.72em;font-weight:700;padding:5px 26px;border-radius:20px;letter-spacing:4px;display:inline-block;white-space:nowrap;}
 .tagline{color:#5a7a7a;font-size:1em;font-weight:400;}
 
 /* Layout */
@@ -57,10 +58,12 @@ input[type=file]{display:none;}
 
 /* Canvas area */
 .canvas-section{display:none;}
-.mode-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-.mode-btn{flex:1;padding:9px;border:2px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88em;color:#1a3a3a;transition:.2s;min-width:90px;font-family:inherit;}
+/* 4-col grid on wide, 2x2 on narrow — keeps every button the same height & width */
+.mode-bar{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;margin-bottom:10px;}
+@media(max-width:560px){.mode-bar{grid-template-columns:1fr 1fr;}}
+.mode-btn{padding:9px 10px;border:2px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88em;color:#1a3a3a;transition:.2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;line-height:1.2;min-height:40px;}
 .mode-btn.active{background:#2d5a5a;color:#fff;border-color:#2d5a5a;}
-.mode-btn.small{flex:0;padding:9px 12px;min-width:0;}
+.mode-btn.small{padding:9px 14px;}
 .mode-btn.warn{color:#c0392b;border-color:#e8b4b0;}
 .mode-btn:disabled{opacity:.4;cursor:not-allowed;}
 .canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #e0e8e8;background:#222;}
@@ -97,10 +100,15 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
 .sect{margin:16px 0 12px;font-size:.78em;font-weight:700;color:#3a5a5a;text-transform:uppercase;letter-spacing:.5px;border-top:1.5px solid #eef;padding-top:14px;}
 
 /* Quote box */
-.quote-box{background:linear-gradient(135deg,#2d5a5a,#1a3a3a);color:#fff;border-radius:12px;padding:22px;margin-top:4px;}
-.q-label{font-size:.78em;text-transform:uppercase;opacity:.8;letter-spacing:.5px;margin-bottom:4px;}
-.q-price{font-size:2.6em;font-weight:800;line-height:1;margin-bottom:14px;}
-.q-rows{border-top:1px solid rgba(255,255,255,.2);padding-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.88em;}
+.quote-box{background:linear-gradient(135deg,#2d5a5a,#1a3a3a);color:#fff;border-radius:12px;padding:20px;margin-top:4px;}
+.quote-compare{display:grid;grid-template-columns:1fr 1px 1fr;gap:12px;align-items:start;margin-bottom:16px;}
+.qc-divider{background:rgba(255,255,255,.22);align-self:stretch;}
+.qc-col{text-align:center;min-width:0;}
+.q-label{font-size:.68em;text-transform:uppercase;opacity:.85;letter-spacing:.4px;margin-bottom:5px;line-height:1.25;font-weight:600;}
+.q-price{font-size:1.85em;font-weight:800;line-height:1.05;}
+.q-price-retail{font-size:1.45em;font-weight:600;line-height:1.05;text-decoration:line-through;opacity:.65;}
+.q-savings{font-size:.72em;color:#7dcea0;font-weight:700;margin-top:4px;letter-spacing:.4px;text-transform:uppercase;}
+.q-rows{border-top:1px solid rgba(255,255,255,.2);padding-top:12px;display:flex;flex-direction:column;gap:6px;font-size:.86em;}
 .q-row{display:flex;justify-content:space-between;opacity:.92;}
 .q-row span:last-child{font-weight:600;}
 
@@ -168,6 +176,8 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
 <header>
   <div class="logo-line">
     <h1>ShuttersDirect<span style="color:#2d5a5a">USA</span></h1>
+  </div>
+  <div class="badge-line">
     <span class="badge">SHUTTER VISUALIZER</span>
   </div>
   <p class="tagline">See your shutters before you buy &mdash; direct from the factory</p>
@@ -239,9 +249,11 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
           <input type="number" id="hInput" min="6" max="120" value="48" step="0.5" inputmode="decimal">
         </div>
       </div>
-      <div style="background:#fffbea;border:1px solid #f0c674;border-radius:7px;padding:9px 12px;font-size:.8em;color:#7a5a14;line-height:1.5;margin-bottom:12px;">
+      <div style="background:#fffbea;border:1px solid #f0c674;border-radius:7px;padding:9px 12px;font-size:.8em;color:#7a5a14;line-height:1.5;margin-bottom:8px;">
         &#128210; <strong>Estimate only.</strong> Always verify with a tape measure before ordering.
-        Questions? Call us: <strong>(800) 555-0199</strong>
+      </div>
+      <div style="text-align:center;font-size:.85em;color:#5a7a7a;margin-bottom:12px;">
+        Questions? Call us: (800) 555-0199
       </div>
       <div class="ctrl-row">
         <div class="ctrl-group">
@@ -306,11 +318,22 @@ input:focus,select:focus{outline:none;border-color:#2d5a5a;background:#fff;box-s
     <div class="sect">Estimated Price</div>
 
     <div class="quote-box">
-      <div class="q-label">Your Estimate</div>
-      <div class="q-price" id="qPrice">$0</div>
+      <div class="quote-compare">
+        <div class="qc-col">
+          <div class="q-label">Your Factory-Direct Estimate</div>
+          <div class="q-price" id="qPrice">$0</div>
+        </div>
+        <div class="qc-divider"></div>
+        <div class="qc-col">
+          <div class="q-label">Retail Price</div>
+          <div class="q-price-retail" id="qPriceRetail">$0</div>
+          <div class="q-savings" id="qSavings">&nbsp;</div>
+        </div>
+      </div>
       <div class="q-rows">
         <div class="q-row"><span>Area</span><span id="qArea">0.00 sq ft</span></div>
-        <div class="q-row"><span>Rate</span><span>$29 / sq ft</span></div>
+        <div class="q-row"><span>Our Rate</span><span>$29 / sq ft</span></div>
+        <div class="q-row"><span>Retail Rate</span><span>$49 / sq ft</span></div>
         <div class="q-row"><span>Ships in</span><span>2&ndash;3 weeks</span></div>
         <div class="q-row"><span>Warranty</span><span>Lifetime</span></div>
       </div>
@@ -407,6 +430,8 @@ const panelSel     = document.getElementById('panelSel');
 const shutterSel   = document.getElementById('shutterSel');
 const louverSel    = document.getElementById('louverSel');
 const qPrice       = document.getElementById('qPrice');
+const qPriceRetail = document.getElementById('qPriceRetail');
+const qSavings     = document.getElementById('qSavings');
 const qArea        = document.getElementById('qArea');
 const resetBtn     = document.getElementById('resetBtn');
 const quoteBtn     = document.getElementById('quoteBtn');
@@ -1289,12 +1314,16 @@ document.querySelectorAll('.color-swatch').forEach(sw => {
 
 // ─── Live quote ───────────────────────────────────────────────────────────────
 function updateQuote() {
-  const w    = parseFloat(wInput.value) || 0;
-  const h    = parseFloat(hInput.value) || 0;
-  const sqft = (w * h) / 144;
-  const tot  = sqft * 29;
-  qArea.textContent  = sqft.toFixed(2) + ' sq ft';
-  qPrice.textContent = '$' + Math.round(tot).toLocaleString();
+  const w      = parseFloat(wInput.value) || 0;
+  const h      = parseFloat(hInput.value) || 0;
+  const sqft   = (w * h) / 144;
+  const tot    = sqft * 29;          // factory-direct
+  const retail = sqft * 49;          // typical big-box rate
+  const save   = retail - tot;
+  qArea.textContent        = sqft.toFixed(2) + ' sq ft';
+  qPrice.textContent       = '$' + Math.round(tot).toLocaleString();
+  qPriceRetail.textContent = '$' + Math.round(retail).toLocaleString();
+  qSavings.innerHTML       = save > 0 ? 'You save $' + Math.round(save).toLocaleString() : '&nbsp;';
 }
 
 [wInput, hInput].forEach(el => {
