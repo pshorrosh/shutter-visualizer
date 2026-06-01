@@ -9,45 +9,33 @@
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f2f4f4;min-height:100vh;padding:16px;}
 .container{max-width:1160px;margin:0 auto;}
 
-/* Header */
 header{text-align:center;padding:24px 0 28px;animation:fadeDown .5s ease;}
 .logo-line{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;}
 h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;}
 .badge{background:#2d5a5a;color:#fff;font-size:.65em;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;vertical-align:middle;}
 .tagline{color:#5a7a7a;font-size:1em;font-weight:400;}
 
-/* Layout */
 .main-grid{display:grid;grid-template-columns:1fr 390px;gap:20px;align-items:start;}
 @media(max-width:820px){.main-grid{grid-template-columns:1fr;}}
 
-/* Panels */
 .panel{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 16px rgba(0,0,0,.07);}
 .panel-title{font-size:1.1em;font-weight:700;color:#1a3a3a;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
 .step-num{width:26px;height:26px;background:#2d5a5a;color:#fff;border-radius:50%;font-size:.8em;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .step-hint{font-size:.82em;color:#5a7a7a;margin-bottom:16px;line-height:1.5;}
 
-/* Upload */
-.upload-zone{border:2px dashed #c0d4d4;border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:.25s;background:#f8fbfb;position:relative;}
+.upload-zone{border:2px dashed #c0d4d4;border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:.25s;background:#f8fbfb;}
 .upload-zone:hover,.upload-zone.drag{border-color:#2d5a5a;background:#eef5f5;}
 .upload-zone svg{width:44px;height:44px;color:#2d5a5a;margin-bottom:10px;}
 .upload-zone p{color:#5a7a7a;font-size:.95em;}
 .upload-zone small{color:#8aa;font-size:.82em;}
 input[type=file]{display:none;}
 
-/* Canvas area */
-.canvas-section{display:none;}
-.mode-bar{display:flex;gap:8px;margin-bottom:10px;}
-.mode-btn{flex:1;padding:9px;border:2px solid #d0dada;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88em;color:#1a3a3a;transition:.2s;}
-.mode-btn.active{background:#2d5a5a;color:#fff;border-color:#2d5a5a;}
+.canvas-section{display:none;margin-top:4px;}
+.canvas-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.drag-hint{font-size:.78em;color:#5a7a7a;display:flex;align-items:center;gap:5px;}
 .canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #e0e8e8;background:#222;}
-canvas{display:block;width:100%;height:auto;cursor:crosshair;touch-action:none;-webkit-touch-callout:none;user-select:none;}
-.corner-status{background:#1a3a3a;color:#fff;padding:8px 14px;font-size:.82em;font-weight:600;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
-.corner-dots{display:flex;gap:4px;}
-.cdot{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);}
-.cdot.placed{background:#7dcea0;border-color:#7dcea0;}
-.cdot.next{background:transparent;border-color:#f0c040;animation:pulse .8s infinite;}
+canvas{display:block;width:100%;height:auto;touch-action:none;-webkit-touch-callout:none;user-select:none;cursor:default;}
 
-/* Controls */
 .ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
 .ctrl-group{display:flex;flex-direction:column;gap:5px;}
 label{font-size:.78em;font-weight:700;color:#3a5a5a;text-transform:uppercase;letter-spacing:.4px;}
@@ -57,7 +45,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .err-msg{font-size:.76em;color:#e74c3c;margin-top:3px;display:none;}
 .err-msg.show{display:block;}
 
-/* Color picker */
 .color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
 .color-swatch{width:36px;height:36px;border-radius:7px;border:3px solid transparent;cursor:pointer;transition:.2s;position:relative;}
 .color-swatch:hover{transform:scale(1.1);}
@@ -65,10 +52,8 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .color-swatch[title]::after{content:attr(title);position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.65em;white-space:nowrap;color:#555;pointer-events:none;opacity:0;transition:.15s;}
 .color-swatch:hover::after{opacity:1;}
 
-/* Section divider */
 .sect{margin:18px 0 12px;font-size:.82em;font-weight:700;color:#3a5a5a;text-transform:uppercase;letter-spacing:.5px;border-top:1.5px solid #eef;padding-top:14px;display:flex;align-items:center;gap:8px;}
 
-/* Quote box */
 .quote-box{background:linear-gradient(135deg,#2d5a5a,#1a3a3a);color:#fff;border-radius:12px;padding:22px;margin-top:4px;}
 .q-label{font-size:.78em;text-transform:uppercase;opacity:.8;letter-spacing:.5px;margin-bottom:4px;}
 .q-price{font-size:2.6em;font-weight:800;line-height:1;margin-bottom:14px;}
@@ -76,26 +61,22 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .q-row{display:flex;justify-content:space-between;opacity:.92;}
 .q-row span:last-child{font-weight:600;}
 
-/* Buttons */
 .btn{padding:12px 16px;border:none;border-radius:8px;font-weight:700;font-size:.88em;cursor:pointer;transition:.2s;letter-spacing:.3px;text-transform:uppercase;}
 .btn-primary{background:#2d5a5a;color:#fff;width:100%;display:block;}
 .btn-primary:hover{background:#1a3a3a;box-shadow:0 6px 18px rgba(26,58,58,.3);}
 .btn-ghost{background:#f0f2f2;color:#1a3a3a;border:1.5px solid #d8e0e0;width:100%;display:block;}
 .btn-ghost:hover{background:#e4eaea;}
+.btn-sm{padding:7px 13px;font-size:.8em;width:auto;display:inline-block;border-radius:7px;}
 
-/* Checkbox */
 .check-label{display:flex;align-items:flex-start;gap:9px;font-size:.88em;color:#1a3a3a;cursor:pointer;margin:12px 0;line-height:1.4;}
 .check-label input[type=checkbox]{margin-top:2px;width:16px;height:16px;accent-color:#2d5a5a;flex-shrink:0;cursor:pointer;}
 
-/* Trust strip */
 .trust{margin-top:14px;background:#f0f8f4;border:1px solid #c8e6d4;border-radius:8px;padding:12px 14px;font-size:.82em;color:#2a6a4a;line-height:1.7;}
 .trust strong{color:#1a4a2a;}
 
-/* Toast */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a3a3a;color:#fff;padding:12px 22px;border-radius:30px;font-size:.88em;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .3s;z-index:9999;pointer-events:none;max-width:90vw;text-align:center;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 
-/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:8888;display:none;align-items:center;justify-content:center;padding:16px;}
 .modal-overlay.open{display:flex;}
 .modal-box{background:#fff;border-radius:16px;padding:28px 28px 24px;max-width:520px;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
@@ -105,22 +86,18 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .modal-sect{margin-bottom:20px;}
 .modal-sect h3{font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#5a7a7a;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #eef;}
 
-/* Order summary */
 .summary-grid{display:grid;grid-template-columns:auto 1fr;gap:5px 16px;font-size:.9em;margin-bottom:10px;}
 .sk{color:#5a7a7a;white-space:nowrap;}
 .sv{font-weight:600;color:#1a3a3a;}
 .summary-total{display:flex;justify-content:space-between;font-size:1.05em;font-weight:800;color:#2d5a5a;padding-top:10px;border-top:1.5px solid #eef;}
 
-/* Multiple note */
 .multi-note{background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:10px 12px;font-size:.85em;color:#5a3a00;line-height:1.5;margin-bottom:4px;}
 
-/* Process list */
 .process-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
 .process-list li{display:flex;align-items:flex-start;gap:10px;font-size:.88em;color:#2a3a3a;line-height:1.45;}
 .pnum{width:24px;height:24px;border-radius:50%;background:#2d5a5a;color:#fff;font-size:.72em;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .install-note{margin-top:14px;font-size:.88em;background:#f0f8f4;border:1px solid #c8e6d4;border-radius:7px;padding:9px 12px;color:#1a3a3a;}
 
-/* Measure guide */
 .measure-guide{border-radius:9px;padding:13px 14px;margin-bottom:14px;font-size:.82em;line-height:1.6;}
 .measure-guide.inside{background:#eef6ff;border:1px solid #b3d4f5;}
 .measure-guide.outside{background:#fff3e8;border:1px solid #f5c894;}
@@ -129,13 +106,11 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .measure-guide ul li{line-height:1.45;}
 .measure-guide .mg-tip{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.12);color:#5a5a2a;font-style:italic;}
 
-/* Contact form */
 .contact-form{display:flex;flex-direction:column;gap:10px;}
 .contact-form input{padding:10px 12px;border:1.5px solid #dde;border-radius:7px;font-size:.93em;color:#222;background:#fafafa;width:100%;}
 .contact-form input:focus{outline:none;border-color:#2d5a5a;background:#fff;box-shadow:0 0 0 3px rgba(45,90,90,.12);}
 
 @keyframes fadeDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
 </style>
 </head>
 <body>
@@ -154,7 +129,7 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
   <!-- LEFT: Visualize panel -->
   <div class="panel">
     <div class="panel-title"><span class="step-num">1</span> Visualize Your Window</div>
-    <p class="step-hint">Upload a photo and tap each corner of your window to preview shutters. <em>This tool works one window at a time &mdash; just repeat for each window.</em></p>
+    <p class="step-hint">Upload a photo of your window — shutters appear instantly. <em>Drag the shutter overlay to reposition it over your window. One window at a time; repeat for each additional window.</em></p>
 
     <div class="upload-zone" id="uploadZone">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -167,21 +142,11 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     </div>
 
     <div class="canvas-section" id="canvasSection">
-      <div class="mode-bar">
-        <button class="mode-btn active" data-mode="markup">&#9999;&#65039; Mark Window</button>
-        <button class="mode-btn" data-mode="preview">&#128065;&#65039; See Shutters</button>
-        <button class="mode-btn" id="startOverCanvas" style="flex:0;padding:9px 14px;color:#c0392b;border-color:#e8b4b0;">&#8634; Start Over</button>
+      <div class="canvas-toolbar">
+        <span class="drag-hint">&#10021; Drag shutters to reposition</span>
+        <button class="btn btn-ghost btn-sm" id="startOverBtn">&#8634; Start Over</button>
       </div>
       <div class="canvas-wrap">
-        <div class="corner-status" id="cornerStatus">
-          <span id="statusText">Tap the <strong>top-left</strong> corner of your window frame</span>
-          <div class="corner-dots" id="cornerDots">
-            <div class="cdot next" id="d0"></div>
-            <div class="cdot" id="d1"></div>
-            <div class="cdot" id="d2"></div>
-            <div class="cdot" id="d3"></div>
-          </div>
-        </div>
         <canvas id="canvas"></canvas>
       </div>
     </div>
@@ -234,9 +199,8 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     <!-- Step 3 -->
     <div class="sect"><span class="step-num">3</span> Get a Price Estimate</div>
 
-    <!-- Measurement guide — swaps based on mount selection -->
     <div class="measure-guide inside" id="measureGuide">
-      <strong class="mg-title">&#128207; How to Measure — Inside Mount</strong>
+      <strong class="mg-title">&#128207; How to Measure &mdash; Inside Mount</strong>
       <ul>
         <li><strong>Width:</strong> Measure the inside of the frame at the top, middle, and bottom. Use the <em>smallest</em> number.</li>
         <li><strong>Height:</strong> Measure the inside of the frame on the left, center, and right. Use the <em>smallest</em> number.</li>
@@ -294,8 +258,8 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 
   </div>
 
-</div><!-- .main-grid -->
-</div><!-- .container -->
+</div>
+</div>
 
 <div id="toast"></div>
 
@@ -305,25 +269,22 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     <button class="modal-close" id="closeModal">&#10005;</button>
     <h2>&#127775; Request Your Full Quote</h2>
 
-    <!-- Order summary -->
     <div class="modal-sect">
       <h3>Your Window Details</h3>
       <div class="summary-grid">
-        <span class="sk">Size</span>     <span class="sv" id="mSize">—</span>
-        <span class="sk">Type</span>     <span class="sv" id="mType">—</span>
-        <span class="sk">Louver</span>   <span class="sv" id="mLouver">—</span>
-        <span class="sk">Color</span>    <span class="sv" id="mColor">—</span>
-        <span class="sk">Mount</span>    <span class="sv" id="mMount">—</span>
+        <span class="sk">Size</span>   <span class="sv" id="mSize">—</span>
+        <span class="sk">Type</span>   <span class="sv" id="mType">—</span>
+        <span class="sk">Louver</span> <span class="sv" id="mLouver">—</span>
+        <span class="sk">Color</span>  <span class="sv" id="mColor">—</span>
+        <span class="sk">Mount</span>  <span class="sv" id="mMount">—</span>
       </div>
       <div class="summary-total"><span>Estimated Price</span><span id="mPrice">—</span></div>
     </div>
 
-    <!-- Multiple windows note (shown conditionally) -->
     <div class="modal-sect" id="multiNote" style="display:none;">
       <div class="multi-note">&#128221; <strong>Multiple windows / complex order noted.</strong> We&rsquo;ll cover all the details on your call.</div>
     </div>
 
-    <!-- Process -->
     <div class="modal-sect">
       <h3>Here&rsquo;s What Happens Next</h3>
       <ol class="process-list">
@@ -336,7 +297,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
       <div class="install-note">&#128222; <strong>Installation support:</strong> <a href="tel:2058416424" style="color:#2d5a5a;font-weight:700;">205-841-6424</a></div>
     </div>
 
-    <!-- Contact form -->
     <div class="modal-sect" style="margin-bottom:0;">
       <h3>Your Contact Info</h3>
       <div class="contact-form">
@@ -346,7 +306,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
         <button class="btn btn-primary" id="submitQuote" style="padding:13px;">Submit &amp; Request My Quote &rarr;</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -357,7 +316,6 @@ const ctx           = canvas.getContext('2d');
 const fileInput     = document.getElementById('fileInput');
 const uploadZone    = document.getElementById('uploadZone');
 const canvasSection = document.getElementById('canvasSection');
-const statusText    = document.getElementById('statusText');
 const wInput        = document.getElementById('wInput');
 const hInput        = document.getElementById('hInput');
 const wErr          = document.getElementById('wErr');
@@ -376,19 +334,10 @@ const quoteModal    = document.getElementById('quoteModal');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let img          = null;
-let corners      = [];
-let dragIdx      = -1;
-let vizMode      = 'markup';
+let overlay      = null;   // { x, y, w, h } in canvas pixels
+let isDragging   = false;
+let dragStart    = null;   // { mx, my, ox, oy }
 let shutterColor = '#f5f5f5';
-const HIT        = 32;
-const CORNER_LABELS = ['TL','TR','BR','BL'];
-const CORNER_HINTS  = [
-  'Tap the <strong>top-left</strong> corner of your window frame',
-  'Tap the <strong>top-right</strong> corner',
-  'Tap the <strong>bottom-right</strong> corner',
-  'Tap the <strong>bottom-left</strong> corner',
-  'All 4 corners set! Switch to <strong>See Shutters</strong> &rarr;',
-];
 const GHL_WEBHOOK = 'https://YOUR-GHL-WEBHOOK-URL-HERE';
 
 // ─── Upload ───────────────────────────────────────────────────────────────────
@@ -416,12 +365,9 @@ function loadFile(file) {
     img = new Image();
     img.onload = () => {
       sizeCanvas();
-      corners = [];
-      vizMode = 'markup';
+      initOverlay();
       uploadZone.style.display = 'none';
       canvasSection.style.display = 'block';
-      setModeButtons('markup');
-      updateCornerStatus();
       drawCanvas();
     };
     img.src = tmp.toDataURL('image/jpeg', 0.88);
@@ -431,150 +377,127 @@ function loadFile(file) {
 
 function sizeCanvas() {
   const maxW = canvas.parentElement.offsetWidth;
-  const ratio = img.height / img.width;
   canvas.width  = maxW;
-  canvas.height = Math.round(maxW * ratio);
+  canvas.height = Math.round(maxW * (img.height / img.width));
 }
 
-// ─── Coordinate helpers ───────────────────────────────────────────────────────
+// ─── Overlay ──────────────────────────────────────────────────────────────────
+function overlayAspect() {
+  const mw = parseFloat(wInput.value);
+  const mh = parseFloat(hInput.value);
+  return (mw > 0 && mh > 0) ? mh / mw : 1.5;
+}
+
+function initOverlay() {
+  const ow = canvas.width * 0.55;
+  const oh = ow * overlayAspect();
+  overlay = {
+    x: (canvas.width  - ow) / 2,
+    y: (canvas.height - oh) / 2,
+    w: ow,
+    h: oh,
+  };
+}
+
+function refreshOverlayAspect() {
+  if (!overlay) return;
+  const cx = overlay.x + overlay.w / 2;
+  const cy = overlay.y + overlay.h / 2;
+  overlay.h = overlay.w * overlayAspect();
+  overlay.x = cx - overlay.w / 2;
+  overlay.y = cy - overlay.h / 2;
+}
+
+function hitOverlay(pt) {
+  if (!overlay) return false;
+  return pt.x >= overlay.x && pt.x <= overlay.x + overlay.w &&
+         pt.y >= overlay.y && pt.y <= overlay.y + overlay.h;
+}
+
+// ─── Coordinate helper ────────────────────────────────────────────────────────
 function canvasCoords(clientX, clientY) {
   const r  = canvas.getBoundingClientRect();
-  const sx = canvas.width  / r.width;
-  const sy = canvas.height / r.height;
-  return { x: (clientX - r.left) * sx, y: (clientY - r.top) * sy };
-}
-function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function nearestCorner(pt) {
-  let best = -1, bestD = Infinity;
-  corners.forEach((c, i) => { const d = dist(c, pt); if (d < bestD) { bestD = d; best = i; } });
-  return bestD < HIT ? best : -1;
+  return {
+    x: (clientX - r.left) * (canvas.width  / r.width),
+    y: (clientY - r.top)  * (canvas.height / r.height),
+  };
 }
 
 // ─── Pointer events ───────────────────────────────────────────────────────────
-canvas.addEventListener('touchstart', e => { e.preventDefault(); handleStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-canvas.addEventListener('touchend',   e => { e.preventDefault(); handleEnd(); }, { passive: false });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); pointerDown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+canvas.addEventListener('touchmove',  e => { e.preventDefault(); pointerMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+canvas.addEventListener('touchend',   e => { e.preventDefault(); pointerUp(); }, { passive: false });
 
-canvas.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
-canvas.addEventListener('mousemove', e => { if (dragIdx !== -1) handleMove(e.clientX, e.clientY); });
-canvas.addEventListener('mouseup',   () => handleEnd());
-canvas.addEventListener('mouseleave',() => { if (dragIdx !== -1) { dragIdx = -1; drawCanvas(); } });
+canvas.addEventListener('mousedown',  e => pointerDown(e.clientX, e.clientY));
+canvas.addEventListener('mousemove',  e => {
+  if (isDragging) {
+    pointerMove(e.clientX, e.clientY);
+  } else if (overlay) {
+    canvas.style.cursor = hitOverlay(canvasCoords(e.clientX, e.clientY)) ? 'move' : 'default';
+  }
+});
+canvas.addEventListener('mouseup',    () => pointerUp());
+canvas.addEventListener('mouseleave', () => { isDragging = false; canvas.style.cursor = 'default'; });
 
-function handleStart(cx, cy) {
-  if (!img || vizMode !== 'markup') return;
-  const pt  = canvasCoords(cx, cy);
-  const hit = nearestCorner(pt);
-  if (hit !== -1) {
-    dragIdx = hit;
-  } else if (corners.length < 4) {
-    corners.push(pt);
-    updateCornerStatus();
-    drawCanvas();
+function pointerDown(cx, cy) {
+  if (!img || !overlay) return;
+  const pt = canvasCoords(cx, cy);
+  if (hitOverlay(pt)) {
+    isDragging = true;
+    dragStart  = { mx: pt.x, my: pt.y, ox: overlay.x, oy: overlay.y };
   }
 }
-function handleMove(cx, cy) {
-  if (!img || vizMode !== 'markup' || dragIdx === -1) return;
-  corners[dragIdx] = canvasCoords(cx, cy);
+
+function pointerMove(cx, cy) {
+  if (!isDragging || !dragStart) return;
+  const pt = canvasCoords(cx, cy);
+  overlay.x = dragStart.ox + (pt.x - dragStart.mx);
+  overlay.y = dragStart.oy + (pt.y - dragStart.my);
   drawCanvas();
 }
-function handleEnd() { dragIdx = -1; }
 
-// ─── Corner status ────────────────────────────────────────────────────────────
-function updateCornerStatus() {
-  statusText.innerHTML = CORNER_HINTS[Math.min(corners.length, 4)];
-  for (let i = 0; i < 4; i++) {
-    const d = document.getElementById('d' + i);
-    d.className = 'cdot' + (i < corners.length ? ' placed' : i === corners.length ? ' next' : '');
-  }
-}
+function pointerUp() { isDragging = false; dragStart = null; }
 
 // ─── Draw ─────────────────────────────────────────────────────────────────────
 function drawCanvas() {
-  if (!img) return;
+  if (!img || !overlay) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  vizMode === 'markup' ? drawMarkup() : drawPreview();
-}
 
-function drawMarkup() {
-  if (corners.length === 4) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(45,90,90,.65)';
-    ctx.lineWidth   = 3;
-    ctx.setLineDash([7, 5]);
-    ctx.beginPath();
-    corners.forEach((c, i) => i === 0 ? ctx.moveTo(c.x, c.y) : ctx.lineTo(c.x, c.y));
-    ctx.closePath(); ctx.stroke();
-    ctx.fillStyle = 'rgba(45,90,90,.07)'; ctx.fill();
-    ctx.setLineDash([]); ctx.restore();
-  }
-  corners.forEach((c, i) => {
-    ctx.fillStyle = 'rgba(45,90,90,.18)';
-    ctx.beginPath(); ctx.arc(c.x, c.y, HIT, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#2d5a5a';
-    ctx.beginPath(); ctx.arc(c.x, c.y, 9, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
-    ctx.fillStyle = '#1a3a3a';
-    ctx.font = 'bold 13px sans-serif';
-    const lx = (i === 1 || i === 2) ? c.x + 14 : c.x - 14;
-    const ly = i < 2 ? c.y - 14 : c.y + 20;
-    ctx.textAlign = (i === 1 || i === 2) ? 'left' : 'right';
-    ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 4;
-    ctx.strokeText(CORNER_LABELS[i], lx, ly);
-    ctx.fillText(CORNER_LABELS[i], lx, ly);
-    ctx.textAlign = 'left';
-  });
-}
+  const { x: x0, y: y0, w: sw, h: sh } = overlay;
+  const mount = mountSel.value;
+  const type  = shutterSel.value;
 
-function drawPreview() {
-  if (corners.length < 4) {
-    ctx.fillStyle = 'rgba(0,0,0,.62)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 17px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Mark all 4 window corners first', canvas.width / 2, canvas.height / 2);
-    ctx.textAlign = 'left'; return;
-  }
-  const tl = corners[0], tr = corners[1], br = corners[2], bl = corners[3];
-  const mount = mountSel.value, type = shutterSel.value;
-  const xs = corners.map(c => c.x), ys = corners.map(c => c.y);
-  let x0 = Math.min(...xs), y0 = Math.min(...ys);
-  let sw = Math.max(...xs) - x0, sh = Math.max(...ys) - y0;
+  // Expand for outside mount
+  let ox = x0, oy = y0, ow = sw, oh = sh;
   if (mount === 'outside') {
     const ex = sw * .07, ey = sh * .05;
-    x0 -= ex; y0 -= ey; sw += ex * 2; sh += ey * 2;
+    ox -= ex; oy -= ey; ow += ex * 2; oh += ey * 2;
   }
+
+  // Clip & draw shutters
   ctx.save();
-  ctx.beginPath();
-  if (mount === 'inside') {
-    ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
-    ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
-  } else { ctx.rect(x0, y0, sw, sh); }
-  ctx.closePath(); ctx.clip();
-  const panelW = sw / 2;
+  ctx.beginPath(); ctx.rect(ox, oy, ow, oh); ctx.clip();
+
+  const panelW = ow / 2;
   if (type === 'arch') {
-    drawArchPanel(ctx, x0, y0, panelW, sh, shutterColor);
-    drawArchPanel(ctx, x0 + panelW, y0, panelW, sh, shutterColor);
+    drawArchPanel(ctx, ox,           oy, panelW, oh, shutterColor);
+    drawArchPanel(ctx, ox + panelW,  oy, panelW, oh, shutterColor);
   } else if (type === 'sunburst') {
-    drawSunburstPanel(ctx, x0, y0, sw, sh, shutterColor);
+    drawSunburstPanel(ctx, ox, oy, ow, oh, shutterColor);
   } else {
-    drawPlantationPanel(ctx, x0, y0, panelW, sh, shutterColor);
-    drawPlantationPanel(ctx, x0 + panelW, y0, panelW, sh, shutterColor);
+    drawPlantationPanel(ctx, ox,          oy, panelW, oh, shutterColor);
+    drawPlantationPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
   }
   ctx.restore();
+
+  // Dashed border around original overlay rect
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 2;
-  ctx.setLineDash([6, 5]);
-  ctx.beginPath();
-  ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
-  ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
-  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
-  if (mount === 'outside') {
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('OUTSIDE MOUNT', x0 + sw / 2, y0 - 7);
-    ctx.textAlign = 'left';
-  }
+  ctx.strokeStyle = 'rgba(255,255,255,.5)';
+  ctx.lineWidth   = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.strokeRect(x0, y0, sw, sh);
+  ctx.setLineDash([]);
   ctx.restore();
 }
 
@@ -615,11 +538,13 @@ function drawPlantationPanel(c, x, y, w, h, color) {
     const gg = c.createLinearGradient(innerX, slotY, innerX, slotY + gapH);
     gg.addColorStop(0, 'rgba(0,0,0,.30)'); gg.addColorStop(.6, 'rgba(0,0,0,.14)'); gg.addColorStop(1, 'rgba(0,0,0,.04)');
     c.fillStyle = gg; c.fillRect(innerX, slotY, innerW, gapH);
+
     const bg = c.createLinearGradient(innerX, bladeY, innerX, bladeY + bladeH);
-    bg.addColorStop(0,    lv(color, 32)); bg.addColorStop(.12, lv(color, 14));
-    bg.addColorStop(.55,  lv(color, -2)); bg.addColorStop(.88, lv(color, -18)); bg.addColorStop(1, lv(color, -28));
+    bg.addColorStop(0,   lv(color, 32)); bg.addColorStop(.12, lv(color, 14));
+    bg.addColorStop(.55, lv(color, -2)); bg.addColorStop(.88, lv(color, -18)); bg.addColorStop(1, lv(color, -28));
     c.fillStyle = bg; c.fillRect(innerX, bladeY, innerW, bladeH);
     c.fillStyle = lv(color, 42); c.fillRect(innerX, bladeY, innerW, Math.max(1, bladeH * .06));
+
     if (i < nBlades - 1) {
       const cast = c.createLinearGradient(innerX, slotY + slotH, innerX, slotY + slotH + gapH * .45);
       cast.addColorStop(0, 'rgba(0,0,0,.22)'); cast.addColorStop(1, 'rgba(0,0,0,0)');
@@ -671,76 +596,21 @@ function drawSunburstPanel(c, x, y, w, h, color) {
   c.restore();
 }
 
-// ─── Mode toggle ──────────────────────────────────────────────────────────────
-function setModeButtons(mode) {
-  vizMode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-}
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => { setModeButtons(btn.dataset.mode); drawCanvas(); });
-});
-
-// ─── Color picker ─────────────────────────────────────────────────────────────
+// ─── Preferences change → redraw ─────────────────────────────────────────────
 document.querySelectorAll('.color-swatch').forEach(sw => {
   sw.addEventListener('click', () => {
     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('sel'));
     sw.classList.add('sel'); shutterColor = sw.dataset.color;
-    if (vizMode === 'preview') drawCanvas();
+    drawCanvas();
   });
 });
 
-// ─── Estimate button ─────────────────────────────────────────────────────────
-estimateBtn.addEventListener('click', () => {
-  const w = parseFloat(wInput.value);
-  const h = parseFloat(hInput.value);
-  let ok = true;
+[shutterSel, louverSel, mountSel].forEach(el => el.addEventListener('change', () => drawCanvas()));
 
-  wInput.classList.remove('field-err'); wErr.classList.remove('show');
-  hInput.classList.remove('field-err'); hErr.classList.remove('show');
-
-  if (!w || w < 6) {
-    wInput.classList.add('field-err'); wErr.classList.add('show');
-    ok = false;
-  }
-  if (!h || h < 6) {
-    hInput.classList.add('field-err'); hErr.classList.add('show');
-    ok = false;
-  }
-  if (!ok) {
-    toast('Please enter your window measurements first.');
-    (document.querySelector('.field-err') || wInput).focus();
-    wInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  updateQuote();
-  quoteSection.style.display = 'block';
-  setTimeout(() => quoteSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-});
-
-// ─── Live quote update ────────────────────────────────────────────────────────
-function updateQuote() {
-  const w = parseFloat(wInput.value) || 0;
-  const h = parseFloat(hInput.value) || 0;
-  const sqft = (w * h) / 144;
-  qSize.textContent  = w + '″ × ' + h + '″';
-  qArea.textContent  = sqft.toFixed(2) + ' sq ft';
-  qPrice.textContent = '$' + Math.round(sqft * 29).toLocaleString();
-}
-
-[wInput, hInput].forEach(el => {
-  el.addEventListener('input',  () => {
-    el.classList.remove('field-err');
-    (el === wInput ? wErr : hErr).classList.remove('show');
-    if (quoteSection.style.display !== 'none') updateQuote();
-    if (vizMode === 'preview') drawCanvas();
-  });
-});
-// ─── Measurement guide ─────────────────────────────────────────────────────
+// ─── Measurement guide ────────────────────────────────────────────────────────
 const GUIDE = {
   inside: {
-    cls:   'inside',
-    title: '&#128207; How to Measure &mdash; Inside Mount',
+    cls: 'inside', title: '&#128207; How to Measure &mdash; Inside Mount',
     items: [
       '<strong>Width:</strong> Measure the inside of the frame at the top, middle, and bottom. Use the <em>smallest</em> number.',
       '<strong>Height:</strong> Measure the inside of the frame on the left, center, and right. Use the <em>smallest</em> number.',
@@ -749,8 +619,7 @@ const GUIDE = {
     tip: '&#128161; Tip: Inside mount gives a clean, built-in look and requires a minimum frame depth of 1&frac34;&rdquo;.',
   },
   outside: {
-    cls:   'outside',
-    title: '&#128207; How to Measure &mdash; Outside Mount',
+    cls: 'outside', title: '&#128207; How to Measure &mdash; Outside Mount',
     items: [
       '<strong>Width:</strong> Measure the total width you want covered. Add at least 1&frac12;&rdquo; overlap on each side beyond the frame.',
       '<strong>Height:</strong> Measure from where the shutter will mount at the top to the desired bottom edge. Add at least 1&frac12;&rdquo; overlap top and bottom.',
@@ -761,26 +630,59 @@ const GUIDE = {
 };
 
 function updateMeasureGuide() {
-  const g   = GUIDE[mountSel.value] || GUIDE.inside;
+  const g = GUIDE[mountSel.value] || GUIDE.inside;
   const box = document.getElementById('measureGuide');
   box.className = 'measure-guide ' + g.cls;
-  box.innerHTML =
-    '<strong class="mg-title">' + g.title + '</strong>' +
+  box.innerHTML = '<strong class="mg-title">' + g.title + '</strong>' +
     '<ul>' + g.items.map(i => '<li>' + i + '</li>').join('') + '</ul>' +
     '<p class="mg-tip">' + g.tip + '</p>';
 }
+mountSel.addEventListener('change', updateMeasureGuide);
 
-mountSel.addEventListener('change', () => {
-  updateMeasureGuide();
-  if (vizMode === 'preview') drawCanvas();
+// ─── Measurement inputs → update overlay aspect + redraw ─────────────────────
+[wInput, hInput].forEach(el => {
+  el.addEventListener('input', () => {
+    el.classList.remove('field-err');
+    (el === wInput ? wErr : hErr).classList.remove('show');
+    if (overlay) { refreshOverlayAspect(); drawCanvas(); }
+    if (quoteSection.style.display !== 'none') updateQuote();
+  });
 });
-[shutterSel, louverSel].forEach(el => {
-  el.addEventListener('change', () => { if (vizMode === 'preview') drawCanvas(); });
+
+// ─── Estimate button ──────────────────────────────────────────────────────────
+estimateBtn.addEventListener('click', () => {
+  const w = parseFloat(wInput.value);
+  const h = parseFloat(hInput.value);
+  let ok = true;
+
+  wInput.classList.remove('field-err'); wErr.classList.remove('show');
+  hInput.classList.remove('field-err'); hErr.classList.remove('show');
+
+  if (!w || w < 6) { wInput.classList.add('field-err'); wErr.classList.add('show'); ok = false; }
+  if (!h || h < 6) { hInput.classList.add('field-err'); hErr.classList.add('show'); ok = false; }
+  if (!ok) {
+    toast('Please enter your window measurements first.');
+    wInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  updateQuote();
+  quoteSection.style.display = 'block';
+  setTimeout(() => quoteSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
 });
+
+function updateQuote() {
+  const w = parseFloat(wInput.value) || 0;
+  const h = parseFloat(hInput.value) || 0;
+  const sqft = (w * h) / 144;
+  qSize.textContent  = w + '″ × ' + h + '″';
+  qArea.textContent  = sqft.toFixed(2) + ' sq ft';
+  qPrice.textContent = '$' + Math.round(sqft * 29).toLocaleString();
+}
 
 // ─── Reset ────────────────────────────────────────────────────────────────────
 function doReset() {
-  img = null; corners = []; dragIdx = -1; vizMode = 'markup';
+  img = null; overlay = null; isDragging = false; dragStart = null;
   canvas.width = 0; canvas.height = 0; fileInput.value = '';
   canvasSection.style.display = 'none';
   uploadZone.style.display = '';
@@ -788,17 +690,15 @@ function doReset() {
   wInput.classList.remove('field-err'); wErr.classList.remove('show');
   hInput.classList.remove('field-err'); hErr.classList.remove('show');
   quoteSection.style.display = 'none';
-  setModeButtons('markup'); updateCornerStatus();
 }
 resetBtn.addEventListener('click', doReset);
-document.getElementById('startOverCanvas').addEventListener('click', doReset);
+document.getElementById('startOverBtn').addEventListener('click', doReset);
 
-// ─── Quote modal open ─────────────────────────────────────────────────────────
+// ─── Quote modal ──────────────────────────────────────────────────────────────
 quoteBtn.addEventListener('click', () => {
-  const w    = parseFloat(wInput.value) || 0;
-  const h    = parseFloat(hInput.value) || 0;
-  const tot  = Math.round((w * h / 144) * 29);
-  const isMulti = document.getElementById('multiWin').checked;
+  const w = parseFloat(wInput.value) || 0;
+  const h = parseFloat(hInput.value) || 0;
+  const tot = Math.round((w * h / 144) * 29);
 
   document.getElementById('mSize').textContent   = w + '″ × ' + h + '″';
   document.getElementById('mType').textContent   = shutterSel.options[shutterSel.selectedIndex].text;
@@ -806,17 +706,13 @@ quoteBtn.addEventListener('click', () => {
   document.getElementById('mColor').textContent  = document.querySelector('.color-swatch.sel')?.title || 'White';
   document.getElementById('mMount').textContent  = mountSel.options[mountSel.selectedIndex].text;
   document.getElementById('mPrice').textContent  = '$' + tot.toLocaleString();
-  document.getElementById('multiNote').style.display = isMulti ? 'block' : 'none';
+  document.getElementById('multiNote').style.display = document.getElementById('multiWin').checked ? 'block' : 'none';
 
   quoteModal.classList.add('open');
   document.body.style.overflow = 'hidden';
 });
 
-// ─── Quote modal close ────────────────────────────────────────────────────────
-function closeModal() {
-  quoteModal.classList.remove('open');
-  document.body.style.overflow = '';
-}
+function closeModal() { quoteModal.classList.remove('open'); document.body.style.overflow = ''; }
 document.getElementById('closeModal').addEventListener('click', closeModal);
 quoteModal.addEventListener('click', e => { if (e.target === quoteModal) closeModal(); });
 
@@ -825,38 +721,22 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
   const name  = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const phone = document.getElementById('cPhone').value.trim();
+  if (!name || !email || !phone) { toast('Please fill in your name, email, and phone number.'); return; }
 
-  if (!name || !email || !phone) {
-    toast('Please fill in your name, email, and phone number.');
-    return;
-  }
-
-  const w     = parseFloat(wInput.value) || 0;
-  const h     = parseFloat(hInput.value) || 0;
-  const sqft  = ((w * h) / 144).toFixed(2);
-  const total = Math.round((w * h / 144) * 29);
-
+  const w = parseFloat(wInput.value) || 0, h = parseFloat(hInput.value) || 0;
   const payload = {
     name, email, phone,
-    width_in:         w,
-    height_in:        h,
-    sq_ft:            sqft,
-    total_price:      total,
-    shutter_type:     shutterSel.value,
-    louver_size:      louverSel.value,
-    mount_type:       mountSel.value,
-    color:            shutterColor,
+    width_in: w, height_in: h,
+    sq_ft: ((w * h) / 144).toFixed(2),
+    total_price: Math.round((w * h / 144) * 29),
+    shutter_type: shutterSel.value, louver_size: louverSel.value,
+    mount_type: mountSel.value, color: shutterColor,
     multiple_windows: document.getElementById('multiWin').checked,
-    source:           'shutter-visualizer',
-    timestamp:        new Date().toISOString(),
+    source: 'shutter-visualizer', timestamp: new Date().toISOString(),
   };
-
-  try {
-    await fetch(GHL_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), mode: 'no-cors' });
-  } catch (_) {}
-
+  try { await fetch(GHL_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), mode:'no-cors' }); } catch(_) {}
   closeModal();
-  toast('Quote submitted! We’ll be in touch shortly. 🎉');
+  toast('Quote submitted! We\'ll be in touch shortly. 🎉');
 });
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -870,7 +750,17 @@ function toast(msg) {
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { if (img) { sizeCanvas(); drawCanvas(); } }, 120);
+  resizeTimer = setTimeout(() => {
+    if (!img) return;
+    const oldW = canvas.width;
+    sizeCanvas();
+    if (overlay && oldW > 0) {
+      const ratio = canvas.width / oldW;
+      overlay.x *= ratio; overlay.y *= ratio;
+      overlay.w *= ratio; overlay.h *= ratio;
+    }
+    drawCanvas();
+  }, 120);
 });
 </script>
 </body>
