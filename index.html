@@ -31,10 +31,19 @@ h1{font-size:2.1em;color:#1a3a3a;font-weight:800;letter-spacing:-1px;}
 input[type=file]{display:none;}
 
 .canvas-section{display:none;margin-top:4px;}
-.canvas-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.drag-hint{font-size:.78em;color:#5a7a7a;display:flex;align-items:center;gap:5px;}
+.canvas-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;}
 .canvas-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #e0e8e8;background:#222;}
 canvas{display:block;width:100%;height:auto;touch-action:none;-webkit-touch-callout:none;user-select:none;cursor:default;}
+
+/* Before/after toggle */
+.ba-toggle{display:flex;background:#f0f2f2;border-radius:8px;padding:3px;gap:3px;flex:1;}
+.ba-btn{flex:1;padding:7px 10px;border:none;border-radius:6px;font-size:.8em;font-weight:700;cursor:pointer;color:#5a7a7a;background:transparent;transition:.2s;white-space:nowrap;}
+.ba-btn.active{background:#2d5a5a;color:#fff;box-shadow:0 2px 6px rgba(45,90,90,.3);}
+
+.btn-sm-ghost{padding:7px 13px;font-size:.8em;font-weight:700;border:1.5px solid #d8e0e0;background:#fff;border-radius:7px;cursor:pointer;color:#c0392b;white-space:nowrap;}
+.btn-sm-ghost:hover{background:#fff0f0;}
+
+.hint-bar{font-size:.76em;color:#5a7a7a;margin-top:7px;text-align:center;line-height:1.4;}
 
 .ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
 .ctrl-group{display:flex;flex-direction:column;gap:5px;}
@@ -66,7 +75,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .btn-primary:hover{background:#1a3a3a;box-shadow:0 6px 18px rgba(26,58,58,.3);}
 .btn-ghost{background:#f0f2f2;color:#1a3a3a;border:1.5px solid #d8e0e0;width:100%;display:block;}
 .btn-ghost:hover{background:#e4eaea;}
-.btn-sm{padding:7px 13px;font-size:.8em;width:auto;display:inline-block;border-radius:7px;}
 
 .check-label{display:flex;align-items:flex-start;gap:9px;font-size:.88em;color:#1a3a3a;cursor:pointer;margin:12px 0;line-height:1.4;}
 .check-label input[type=checkbox]{margin-top:2px;width:16px;height:16px;accent-color:#2d5a5a;flex-shrink:0;cursor:pointer;}
@@ -129,7 +137,7 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
   <!-- LEFT: Visualize panel -->
   <div class="panel">
     <div class="panel-title"><span class="step-num">1</span> Visualize Your Window</div>
-    <p class="step-hint">Upload a photo of your window — shutters appear instantly. <em>Drag the shutter overlay to reposition it over your window. One window at a time; repeat for each additional window.</em></p>
+    <p class="step-hint">Upload a photo — shutters appear instantly. <strong>Drag</strong> to reposition, <strong>drag corners</strong> to resize to fit your frame. Toggle before/after to compare. <em>One window at a time.</em></p>
 
     <div class="upload-zone" id="uploadZone">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -143,19 +151,22 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 
     <div class="canvas-section" id="canvasSection">
       <div class="canvas-toolbar">
-        <span class="drag-hint">&#10021; Drag shutters to reposition</span>
-        <button class="btn btn-ghost btn-sm" id="startOverBtn">&#8634; Start Over</button>
+        <div class="ba-toggle">
+          <button class="ba-btn active" id="btnAfter">&#128065; With Shutters</button>
+          <button class="ba-btn" id="btnBefore">&#128247; Original</button>
+        </div>
+        <button class="btn-sm-ghost" id="startOverBtn">&#8634; Start Over</button>
       </div>
       <div class="canvas-wrap">
         <canvas id="canvas"></canvas>
       </div>
+      <p class="hint-bar">&#8597; Drag shutters to move &nbsp;|&nbsp; &#8689; Drag corners to resize</p>
     </div>
   </div>
 
   <!-- RIGHT: Preferences + Estimate + Quote -->
   <div class="panel">
 
-    <!-- Step 2 -->
     <div class="panel-title"><span class="step-num">2</span> Choose Your Preferences</div>
 
     <div class="ctrl-group" style="margin-bottom:14px;">
@@ -196,7 +207,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
       </select>
     </div>
 
-    <!-- Step 3 -->
     <div class="sect"><span class="step-num">3</span> Get a Price Estimate</div>
 
     <div class="measure-guide inside" id="measureGuide">
@@ -224,7 +234,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 
     <button class="btn btn-primary" id="estimateBtn" style="margin-bottom:4px;">Calculate My Estimate &rarr;</button>
 
-    <!-- Revealed after estimate -->
     <div id="quoteSection" style="display:none;">
       <div class="quote-box" style="margin-top:14px;">
         <div class="q-label">Your Estimate &mdash; 1 Window</div>
@@ -238,7 +247,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
         </div>
       </div>
 
-      <!-- Step 4 -->
       <div class="sect"><span class="step-num">4</span> Get a Full Quote</div>
 
       <label class="check-label">
@@ -257,7 +265,6 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     </div>
 
   </div>
-
 </div>
 </div>
 
@@ -334,11 +341,16 @@ const quoteModal    = document.getElementById('quoteModal');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let img          = null;
-let overlay      = null;   // { x, y, w, h } in canvas pixels
-let isDragging   = false;
-let dragStart    = null;   // { mx, my, ox, oy }
+let overlay      = null;    // { x, y, w, h }
+let showShutters = true;
+let action       = null;    // null | 'move' | 'tl'|'tr'|'bl'|'br'
+let dragStart    = null;    // { mx, my, ox, oy, ow, oh }
 let shutterColor = '#f5f5f5';
-const GHL_WEBHOOK = 'https://YOUR-GHL-WEBHOOK-URL-HERE';
+const HS         = 14;      // handle half-size in canvas px
+
+// Email recipients
+const EMAIL_TO  = 'tom@polydesign.com';
+const EMAIL_CC  = 'paul@shuttersdirectusa.com,rena@polydesign.com,mackenzie@shuttersdirectusa.com';
 
 // ─── Upload ───────────────────────────────────────────────────────────────────
 uploadZone.addEventListener('click', () => fileInput.click());
@@ -357,8 +369,7 @@ function loadFile(file) {
   raw.onload = () => {
     URL.revokeObjectURL(url);
     const scale = Math.min(1, MAX_PX / Math.max(raw.width, raw.height));
-    const w = Math.round(raw.width  * scale);
-    const h = Math.round(raw.height * scale);
+    const w = Math.round(raw.width * scale), h = Math.round(raw.height * scale);
     const tmp = document.createElement('canvas');
     tmp.width = w; tmp.height = h;
     tmp.getContext('2d').drawImage(raw, 0, 0, w, h);
@@ -366,12 +377,7 @@ function loadFile(file) {
     img.onload = () => {
       uploadZone.style.display = 'none';
       canvasSection.style.display = 'block';
-      // Let the browser lay out the now-visible container before measuring its width
-      requestAnimationFrame(() => {
-        sizeCanvas();
-        initOverlay();
-        drawCanvas();
-      });
+      requestAnimationFrame(() => { sizeCanvas(); initOverlay(); drawCanvas(); });
     };
     img.src = tmp.toDataURL('image/jpeg', 0.88);
   };
@@ -386,44 +392,51 @@ function sizeCanvas() {
 
 // ─── Overlay ──────────────────────────────────────────────────────────────────
 function overlayAspect() {
-  const mw = parseFloat(wInput.value);
-  const mh = parseFloat(hInput.value);
+  const mw = parseFloat(wInput.value), mh = parseFloat(hInput.value);
   return (mw > 0 && mh > 0) ? mh / mw : 1.5;
 }
 
 function initOverlay() {
-  const ow = canvas.width * 0.55;
-  const oh = ow * overlayAspect();
+  const ow = Math.round(canvas.width * 0.55);
+  const oh = Math.round(ow * overlayAspect());
   overlay = {
-    x: (canvas.width  - ow) / 2,
-    y: (canvas.height - oh) / 2,
-    w: ow,
-    h: oh,
+    x: Math.round((canvas.width  - ow) / 2),
+    y: Math.round((canvas.height - oh) / 2),
+    w: ow, h: oh,
   };
 }
 
 function refreshOverlayAspect() {
   if (!overlay) return;
-  const cx = overlay.x + overlay.w / 2;
-  const cy = overlay.y + overlay.h / 2;
-  overlay.h = overlay.w * overlayAspect();
-  overlay.x = cx - overlay.w / 2;
-  overlay.y = cy - overlay.h / 2;
+  const cx = overlay.x + overlay.w / 2, cy = overlay.y + overlay.h / 2;
+  overlay.h = Math.round(overlay.w * overlayAspect());
+  overlay.x = Math.round(cx - overlay.w / 2);
+  overlay.y = Math.round(cy - overlay.h / 2);
 }
 
-function hitOverlay(pt) {
-  if (!overlay) return false;
-  return pt.x >= overlay.x && pt.x <= overlay.x + overlay.w &&
-         pt.y >= overlay.y && pt.y <= overlay.y + overlay.h;
+// ─── Handle positions ─────────────────────────────────────────────────────────
+function getHandles() {
+  if (!overlay) return {};
+  const {x, y, w, h} = overlay;
+  return { tl:{x,y}, tr:{x:x+w,y}, bl:{x,y:y+h}, br:{x:x+w,y:y+h} };
+}
+
+function hitTest(pt) {
+  if (!overlay) return null;
+  const handles = getHandles();
+  for (const [id, hp] of Object.entries(handles)) {
+    if (Math.abs(pt.x - hp.x) <= HS && Math.abs(pt.y - hp.y) <= HS) return id;
+  }
+  // Hit body
+  if (pt.x > overlay.x && pt.x < overlay.x + overlay.w &&
+      pt.y > overlay.y && pt.y < overlay.y + overlay.h) return 'move';
+  return null;
 }
 
 // ─── Coordinate helper ────────────────────────────────────────────────────────
-function canvasCoords(clientX, clientY) {
-  const r  = canvas.getBoundingClientRect();
-  return {
-    x: (clientX - r.left) * (canvas.width  / r.width),
-    y: (clientY - r.top)  * (canvas.height / r.height),
-  };
+function canvasCoords(cx, cy) {
+  const r = canvas.getBoundingClientRect();
+  return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height) };
 }
 
 // ─── Pointer events ───────────────────────────────────────────────────────────
@@ -433,33 +446,65 @@ canvas.addEventListener('touchend',   e => { e.preventDefault(); pointerUp(); },
 
 canvas.addEventListener('mousedown',  e => pointerDown(e.clientX, e.clientY));
 canvas.addEventListener('mousemove',  e => {
-  if (isDragging) {
-    pointerMove(e.clientX, e.clientY);
-  } else if (overlay) {
-    canvas.style.cursor = hitOverlay(canvasCoords(e.clientX, e.clientY)) ? 'move' : 'default';
-  }
+  if (action) { pointerMove(e.clientX, e.clientY); return; }
+  if (!overlay) return;
+  const hit = hitTest(canvasCoords(e.clientX, e.clientY));
+  canvas.style.cursor = hit === 'move' ? 'move' : hit ? 'nwse-resize' : 'default';
 });
 canvas.addEventListener('mouseup',    () => pointerUp());
-canvas.addEventListener('mouseleave', () => { isDragging = false; canvas.style.cursor = 'default'; });
+canvas.addEventListener('mouseleave', () => { action = null; dragStart = null; canvas.style.cursor = 'default'; });
 
 function pointerDown(cx, cy) {
   if (!img || !overlay) return;
-  const pt = canvasCoords(cx, cy);
-  if (hitOverlay(pt)) {
-    isDragging = true;
-    dragStart  = { mx: pt.x, my: pt.y, ox: overlay.x, oy: overlay.y };
-  }
+  const pt  = canvasCoords(cx, cy);
+  const hit = hitTest(pt);
+  if (!hit) return;
+  action    = hit;
+  dragStart = { mx: pt.x, my: pt.y, ox: overlay.x, oy: overlay.y, ow: overlay.w, oh: overlay.h };
 }
 
 function pointerMove(cx, cy) {
-  if (!isDragging || !dragStart) return;
+  if (!action || !dragStart) return;
   const pt = canvasCoords(cx, cy);
-  overlay.x = dragStart.ox + (pt.x - dragStart.mx);
-  overlay.y = dragStart.oy + (pt.y - dragStart.my);
+  const dx = pt.x - dragStart.mx, dy = pt.y - dragStart.my;
+  const MIN = 40;
+
+  if (action === 'move') {
+    overlay.x = dragStart.ox + dx;
+    overlay.y = dragStart.oy + dy;
+  } else {
+    let {ox, oy, ow, oh} = dragStart;
+    if (action === 'tl') {
+      overlay.x = ox + dx; overlay.y = oy + dy;
+      overlay.w = Math.max(MIN, ow - dx); overlay.h = Math.max(MIN, oh - dy);
+    } else if (action === 'tr') {
+      overlay.y = oy + dy;
+      overlay.w = Math.max(MIN, ow + dx); overlay.h = Math.max(MIN, oh - dy);
+    } else if (action === 'bl') {
+      overlay.x = ox + dx;
+      overlay.w = Math.max(MIN, ow - dx); overlay.h = Math.max(MIN, oh + dy);
+    } else if (action === 'br') {
+      overlay.w = Math.max(MIN, ow + dx); overlay.h = Math.max(MIN, oh + dy);
+    }
+  }
   drawCanvas();
 }
 
-function pointerUp() { isDragging = false; dragStart = null; }
+function pointerUp() { action = null; dragStart = null; }
+
+// ─── Before / After toggle ────────────────────────────────────────────────────
+document.getElementById('btnAfter').addEventListener('click', () => {
+  showShutters = true;
+  document.getElementById('btnAfter').classList.add('active');
+  document.getElementById('btnBefore').classList.remove('active');
+  drawCanvas();
+});
+document.getElementById('btnBefore').addEventListener('click', () => {
+  showShutters = false;
+  document.getElementById('btnBefore').classList.add('active');
+  document.getElementById('btnAfter').classList.remove('active');
+  drawCanvas();
+});
 
 // ─── Draw ─────────────────────────────────────────────────────────────────────
 function drawCanvas() {
@@ -467,47 +512,55 @@ function drawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-  const { x: x0, y: y0, w: sw, h: sh } = overlay;
-  const mount = mountSel.value;
-  const type  = shutterSel.value;
+  if (showShutters) {
+    const { x: x0, y: y0, w: sw, h: sh } = overlay;
+    const mount = mountSel.value, type = shutterSel.value;
 
-  // Expand for outside mount
-  let ox = x0, oy = y0, ow = sw, oh = sh;
-  if (mount === 'outside') {
-    const ex = sw * .07, ey = sh * .05;
-    ox -= ex; oy -= ey; ow += ex * 2; oh += ey * 2;
+    let ox = x0, oy = y0, ow = sw, oh = sh;
+    if (mount === 'outside') {
+      const ex = sw * .07, ey = sh * .05;
+      ox -= ex; oy -= ey; ow += ex * 2; oh += ey * 2;
+    }
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(ox, oy, ow, oh); ctx.clip();
+    const panelW = ow / 2;
+    if (type === 'arch') {
+      drawArchPanel(ctx, ox, oy, panelW, oh, shutterColor);
+      drawArchPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
+    } else if (type === 'sunburst') {
+      drawSunburstPanel(ctx, ox, oy, ow, oh, shutterColor);
+    } else {
+      drawPlantationPanel(ctx, ox, oy, panelW, oh, shutterColor);
+      drawPlantationPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
+    }
+    ctx.restore();
   }
 
-  // Clip & draw shutters
+  // Overlay border
   ctx.save();
-  ctx.beginPath(); ctx.rect(ox, oy, ow, oh); ctx.clip();
-
-  const panelW = ow / 2;
-  if (type === 'arch') {
-    drawArchPanel(ctx, ox,           oy, panelW, oh, shutterColor);
-    drawArchPanel(ctx, ox + panelW,  oy, panelW, oh, shutterColor);
-  } else if (type === 'sunburst') {
-    drawSunburstPanel(ctx, ox, oy, ow, oh, shutterColor);
-  } else {
-    drawPlantationPanel(ctx, ox,          oy, panelW, oh, shutterColor);
-    drawPlantationPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
-  }
-  ctx.restore();
-
-  // Dashed border around original overlay rect
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,.5)';
-  ctx.lineWidth   = 1.5;
+  ctx.strokeStyle = showShutters ? 'rgba(255,255,255,.45)' : 'rgba(45,90,90,.7)';
+  ctx.lineWidth = 1.5;
   ctx.setLineDash([5, 4]);
-  ctx.strokeRect(x0, y0, sw, sh);
+  ctx.strokeRect(overlay.x, overlay.y, overlay.w, overlay.h);
   ctx.setLineDash([]);
   ctx.restore();
+
+  // Corner handles
+  const handles = getHandles();
+  for (const hp of Object.values(handles)) {
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#2d5a5a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(hp.x, hp.y, 7, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+  }
 }
 
 // ─── Shutter rendering ────────────────────────────────────────────────────────
 function lv(color, pct) {
-  const n = parseInt(color.replace('#',''), 16);
-  const amt = Math.round(2.55 * pct);
+  const n = parseInt(color.replace('#',''), 16), amt = Math.round(2.55 * pct);
   const cl = v => Math.max(0, Math.min(255, v));
   const r = cl((n >> 16) + amt), g = cl(((n >> 8) & 0xff) + amt), b = cl((n & 0xff) + amt);
   return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
@@ -523,247 +576,226 @@ function drawPlantationPanel(c, x, y, w, h, color) {
   const innerY   = y + railH,  innerH = h - railH * 2;
 
   const sg = c.createLinearGradient(x, y, x + stileW, y);
-  sg.addColorStop(0, lv(color, 18)); sg.addColorStop(.5, lv(color, 6)); sg.addColorStop(1, lv(color, -6));
+  sg.addColorStop(0, lv(color,18)); sg.addColorStop(.5, lv(color,6)); sg.addColorStop(1, lv(color,-6));
   c.fillStyle = sg;
   c.fillRect(x, y, stileW, h); c.fillRect(x + w - stileW, y, stileW, h);
 
   const rg = c.createLinearGradient(x, y, x, y + railH);
-  rg.addColorStop(0, lv(color, 14)); rg.addColorStop(1, lv(color, -4));
+  rg.addColorStop(0, lv(color,14)); rg.addColorStop(1, lv(color,-4));
   c.fillStyle = rg;
   c.fillRect(innerX, y, innerW, railH); c.fillRect(innerX, y + h - railH, innerW, railH);
 
   const nBlades = Math.max(2, Math.round(innerH / louverPx));
-  const slotH   = innerH / nBlades;
-  const gapH    = slotH * 0.32, bladeH = slotH * 0.68;
+  const slotH = innerH / nBlades, gapH = slotH * .32, bladeH = slotH * .68;
 
   for (let i = 0; i < nBlades; i++) {
     const slotY = innerY + i * slotH, bladeY = slotY + gapH;
     const gg = c.createLinearGradient(innerX, slotY, innerX, slotY + gapH);
-    gg.addColorStop(0, 'rgba(0,0,0,.30)'); gg.addColorStop(.6, 'rgba(0,0,0,.14)'); gg.addColorStop(1, 'rgba(0,0,0,.04)');
+    gg.addColorStop(0,'rgba(0,0,0,.30)'); gg.addColorStop(.6,'rgba(0,0,0,.14)'); gg.addColorStop(1,'rgba(0,0,0,.04)');
     c.fillStyle = gg; c.fillRect(innerX, slotY, innerW, gapH);
-
     const bg = c.createLinearGradient(innerX, bladeY, innerX, bladeY + bladeH);
-    bg.addColorStop(0,   lv(color, 32)); bg.addColorStop(.12, lv(color, 14));
-    bg.addColorStop(.55, lv(color, -2)); bg.addColorStop(.88, lv(color, -18)); bg.addColorStop(1, lv(color, -28));
+    bg.addColorStop(0,lv(color,32)); bg.addColorStop(.12,lv(color,14)); bg.addColorStop(.55,lv(color,-2)); bg.addColorStop(.88,lv(color,-18)); bg.addColorStop(1,lv(color,-28));
     c.fillStyle = bg; c.fillRect(innerX, bladeY, innerW, bladeH);
-    c.fillStyle = lv(color, 42); c.fillRect(innerX, bladeY, innerW, Math.max(1, bladeH * .06));
-
+    c.fillStyle = lv(color,42); c.fillRect(innerX, bladeY, innerW, Math.max(1, bladeH * .06));
     if (i < nBlades - 1) {
       const cast = c.createLinearGradient(innerX, slotY + slotH, innerX, slotY + slotH + gapH * .45);
-      cast.addColorStop(0, 'rgba(0,0,0,.22)'); cast.addColorStop(1, 'rgba(0,0,0,0)');
+      cast.addColorStop(0,'rgba(0,0,0,.22)'); cast.addColorStop(1,'rgba(0,0,0,0)');
       c.fillStyle = cast; c.fillRect(innerX, slotY + slotH, innerW, gapH * .45);
     }
   }
-  c.save(); c.shadowColor = 'rgba(0,0,0,.35)'; c.shadowBlur = 3;
-  c.strokeStyle = lv(color, -32); c.lineWidth = 2.5;
-  c.beginPath(); c.moveTo(x + w / 2, innerY + 4); c.lineTo(x + w / 2, innerY + innerH - 4); c.stroke(); c.restore();
-  c.strokeStyle = lv(color, -30); c.lineWidth = 2; c.strokeRect(x, y, w, h);
+  c.save(); c.shadowColor='rgba(0,0,0,.35)'; c.shadowBlur=3; c.strokeStyle=lv(color,-32); c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(x+w/2, innerY+4); c.lineTo(x+w/2, innerY+innerH-4); c.stroke(); c.restore();
+  c.strokeStyle=lv(color,-30); c.lineWidth=2; c.strokeRect(x,y,w,h);
 }
 
 function drawArchPanel(c, x, y, w, h, color) {
-  const archH = h * .28, archR = w / 2;
+  const archH = h*.28, archR = w/2;
   c.save();
-  c.beginPath();
-  c.moveTo(x, y + archH); c.arc(x + w / 2, y + archH, archR, Math.PI, 0, false);
-  c.lineTo(x + w, y + h); c.lineTo(x, y + h); c.closePath(); c.clip();
-  drawPlantationPanel(c, x, y + archH, w, h - archH, color);
-  const ag = c.createRadialGradient(x + w / 2, y + archH, 0, x + w / 2, y + archH, archR);
-  ag.addColorStop(0, lv(color, 20)); ag.addColorStop(1, lv(color, -5));
-  c.fillStyle = ag; c.beginPath(); c.arc(x + w / 2, y + archH, archR, Math.PI, 0, false); c.closePath(); c.fill();
-  c.strokeStyle = lv(color, -25); c.lineWidth = 2;
-  c.beginPath(); c.arc(x + w / 2, y + archH, archR, Math.PI, 0, false); c.stroke();
+  c.beginPath(); c.moveTo(x,y+archH); c.arc(x+w/2,y+archH,archR,Math.PI,0,false);
+  c.lineTo(x+w,y+h); c.lineTo(x,y+h); c.closePath(); c.clip();
+  drawPlantationPanel(c,x,y+archH,w,h-archH,color);
+  const ag = c.createRadialGradient(x+w/2,y+archH,0,x+w/2,y+archH,archR);
+  ag.addColorStop(0,lv(color,20)); ag.addColorStop(1,lv(color,-5));
+  c.fillStyle=ag; c.beginPath(); c.arc(x+w/2,y+archH,archR,Math.PI,0,false); c.closePath(); c.fill();
+  c.strokeStyle=lv(color,-25); c.lineWidth=2; c.beginPath(); c.arc(x+w/2,y+archH,archR,Math.PI,0,false); c.stroke();
   c.restore();
 }
 
 function drawSunburstPanel(c, x, y, w, h, color) {
-  const cx2 = x + w / 2, topY = y + h * .12;
-  const nRays = 14, rayLen = Math.max(w, h) * .9;
-  c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip();
-  c.fillStyle = lv(color, -5); c.fillRect(x, y, w, h);
-  for (let i = 0; i <= nRays; i++) {
-    const angle = (Math.PI / nRays) * i;
-    const rg = c.createLinearGradient(cx2, topY, cx2 + Math.cos(Math.PI - angle) * rayLen, topY + Math.sin(Math.PI - angle) * rayLen);
-    rg.addColorStop(0, lv(color, 25)); rg.addColorStop(.4, lv(color, 8)); rg.addColorStop(1, lv(color, -12));
-    const bw = rayLen * .045;
-    c.save(); c.translate(cx2, topY); c.rotate(Math.PI - angle);
-    c.fillStyle = rg; c.fillRect(0, -bw / 2, rayLen, bw);
-    c.strokeStyle = lv(color, -28); c.lineWidth = .8; c.strokeRect(0, -bw / 2, rayLen, bw);
-    c.restore();
+  const cx2=x+w/2, topY=y+h*.12, nRays=14, rayLen=Math.max(w,h)*.9;
+  c.save(); c.beginPath(); c.rect(x,y,w,h); c.clip();
+  c.fillStyle=lv(color,-5); c.fillRect(x,y,w,h);
+  for (let i=0; i<=nRays; i++) {
+    const angle=(Math.PI/nRays)*i;
+    const rg=c.createLinearGradient(cx2,topY,cx2+Math.cos(Math.PI-angle)*rayLen,topY+Math.sin(Math.PI-angle)*rayLen);
+    rg.addColorStop(0,lv(color,25)); rg.addColorStop(.4,lv(color,8)); rg.addColorStop(1,lv(color,-12));
+    const bw=rayLen*.045;
+    c.save(); c.translate(cx2,topY); c.rotate(Math.PI-angle);
+    c.fillStyle=rg; c.fillRect(0,-bw/2,rayLen,bw);
+    c.strokeStyle=lv(color,-28); c.lineWidth=.8; c.strokeRect(0,-bw/2,rayLen,bw); c.restore();
   }
-  const hubR = w * .045;
-  const hg = c.createRadialGradient(cx2, topY, 0, cx2, topY, hubR);
-  hg.addColorStop(0, lv(color, 40)); hg.addColorStop(1, lv(color, 0));
-  c.fillStyle = hg; c.beginPath(); c.arc(cx2, topY, hubR, 0, Math.PI * 2); c.fill();
-  c.strokeStyle = lv(color, -30); c.lineWidth = 1.5; c.stroke();
-  c.strokeStyle = lv(color, -25); c.lineWidth = 2.5; c.strokeRect(x, y, w, h);
+  const hubR=w*.045;
+  const hg=c.createRadialGradient(cx2,topY,0,cx2,topY,hubR);
+  hg.addColorStop(0,lv(color,40)); hg.addColorStop(1,lv(color,0));
+  c.fillStyle=hg; c.beginPath(); c.arc(cx2,topY,hubR,0,Math.PI*2); c.fill();
+  c.strokeStyle=lv(color,-30); c.lineWidth=1.5; c.stroke();
+  c.strokeStyle=lv(color,-25); c.lineWidth=2.5; c.strokeRect(x,y,w,h);
   c.restore();
 }
 
-// ─── Preferences change → redraw ─────────────────────────────────────────────
+// ─── Preferences → redraw ─────────────────────────────────────────────────────
 document.querySelectorAll('.color-swatch').forEach(sw => {
   sw.addEventListener('click', () => {
     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('sel'));
-    sw.classList.add('sel'); shutterColor = sw.dataset.color;
-    drawCanvas();
+    sw.classList.add('sel'); shutterColor = sw.dataset.color; drawCanvas();
   });
 });
-
 [shutterSel, louverSel, mountSel].forEach(el => el.addEventListener('change', () => drawCanvas()));
 
 // ─── Measurement guide ────────────────────────────────────────────────────────
 const GUIDE = {
-  inside: {
-    cls: 'inside', title: '&#128207; How to Measure &mdash; Inside Mount',
-    items: [
-      '<strong>Width:</strong> Measure the inside of the frame at the top, middle, and bottom. Use the <em>smallest</em> number.',
-      '<strong>Height:</strong> Measure the inside of the frame on the left, center, and right. Use the <em>smallest</em> number.',
-      'Measure to the nearest &frac18;&rdquo;. Do <em>not</em> deduct &mdash; we handle the fit allowance.',
-    ],
-    tip: '&#128161; Tip: Inside mount gives a clean, built-in look and requires a minimum frame depth of 1&frac34;&rdquo;.',
-  },
-  outside: {
-    cls: 'outside', title: '&#128207; How to Measure &mdash; Outside Mount',
-    items: [
-      '<strong>Width:</strong> Measure the total width you want covered. Add at least 1&frac12;&rdquo; overlap on each side beyond the frame.',
-      '<strong>Height:</strong> Measure from where the shutter will mount at the top to the desired bottom edge. Add at least 1&frac12;&rdquo; overlap top and bottom.',
-      'Measure to the nearest &frac18;&rdquo;. Enter the finished size you want &mdash; we build exactly to it.',
-    ],
-    tip: '&#128161; Tip: Outside mount covers more of the wall and works on any window, regardless of frame depth.',
-  },
+  inside:{cls:'inside',title:'&#128207; How to Measure &mdash; Inside Mount',items:['<strong>Width:</strong> Measure the inside of the frame at the top, middle, and bottom. Use the <em>smallest</em> number.','<strong>Height:</strong> Measure the inside of the frame on the left, center, and right. Use the <em>smallest</em> number.','Measure to the nearest &frac18;&rdquo;. Do <em>not</em> deduct &mdash; we handle the fit allowance.'],tip:'&#128161; Tip: Inside mount gives a clean, built-in look and requires a minimum frame depth of 1&frac34;&rdquo;.'},
+  outside:{cls:'outside',title:'&#128207; How to Measure &mdash; Outside Mount',items:['<strong>Width:</strong> Measure the total width you want covered. Add at least 1&frac12;&rdquo; overlap on each side beyond the frame.','<strong>Height:</strong> Measure from where the shutter will mount at the top to the desired bottom edge. Add at least 1&frac12;&rdquo; overlap top and bottom.','Measure to the nearest &frac18;&rdquo;. Enter the finished size you want &mdash; we build exactly to it.'],tip:'&#128161; Tip: Outside mount covers more of the wall and works on any window, regardless of frame depth.'},
 };
-
 function updateMeasureGuide() {
-  const g = GUIDE[mountSel.value] || GUIDE.inside;
-  const box = document.getElementById('measureGuide');
-  box.className = 'measure-guide ' + g.cls;
-  box.innerHTML = '<strong class="mg-title">' + g.title + '</strong>' +
-    '<ul>' + g.items.map(i => '<li>' + i + '</li>').join('') + '</ul>' +
-    '<p class="mg-tip">' + g.tip + '</p>';
+  const g=GUIDE[mountSel.value]||GUIDE.inside, box=document.getElementById('measureGuide');
+  box.className='measure-guide '+g.cls;
+  box.innerHTML='<strong class="mg-title">'+g.title+'</strong><ul>'+g.items.map(i=>'<li>'+i+'</li>').join('')+'</ul><p class="mg-tip">'+g.tip+'</p>';
 }
 mountSel.addEventListener('change', updateMeasureGuide);
 
-// ─── Measurement inputs → update overlay aspect + redraw ─────────────────────
+// ─── Measurement inputs ───────────────────────────────────────────────────────
 [wInput, hInput].forEach(el => {
   el.addEventListener('input', () => {
     el.classList.remove('field-err');
-    (el === wInput ? wErr : hErr).classList.remove('show');
+    (el===wInput?wErr:hErr).classList.remove('show');
     if (overlay) { refreshOverlayAspect(); drawCanvas(); }
-    if (quoteSection.style.display !== 'none') updateQuote();
+    if (quoteSection.style.display!=='none') updateQuote();
   });
 });
 
-// ─── Estimate button ──────────────────────────────────────────────────────────
+// ─── Estimate ─────────────────────────────────────────────────────────────────
 estimateBtn.addEventListener('click', () => {
-  const w = parseFloat(wInput.value);
-  const h = parseFloat(hInput.value);
-  let ok = true;
-
+  const w=parseFloat(wInput.value), h=parseFloat(hInput.value);
+  let ok=true;
   wInput.classList.remove('field-err'); wErr.classList.remove('show');
   hInput.classList.remove('field-err'); hErr.classList.remove('show');
-
-  if (!w || w < 6) { wInput.classList.add('field-err'); wErr.classList.add('show'); ok = false; }
-  if (!h || h < 6) { hInput.classList.add('field-err'); hErr.classList.add('show'); ok = false; }
-  if (!ok) {
-    toast('Please enter your window measurements first.');
-    wInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
+  if(!w||w<6){wInput.classList.add('field-err');wErr.classList.add('show');ok=false;}
+  if(!h||h<6){hInput.classList.add('field-err');hErr.classList.add('show');ok=false;}
+  if(!ok){toast('Please enter your window measurements first.');wInput.scrollIntoView({behavior:'smooth',block:'center'});return;}
   updateQuote();
-  quoteSection.style.display = 'block';
-  setTimeout(() => quoteSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  quoteSection.style.display='block';
+  setTimeout(()=>quoteSection.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 });
 
 function updateQuote() {
-  const w = parseFloat(wInput.value) || 0;
-  const h = parseFloat(hInput.value) || 0;
-  const sqft = (w * h) / 144;
-  qSize.textContent  = w + '″ × ' + h + '″';
-  qArea.textContent  = sqft.toFixed(2) + ' sq ft';
-  qPrice.textContent = '$' + Math.round(sqft * 29).toLocaleString();
+  const w=parseFloat(wInput.value)||0, h=parseFloat(hInput.value)||0;
+  const sqft=(w*h)/144;
+  qSize.textContent=w+'″ × '+h+'″';
+  qArea.textContent=sqft.toFixed(2)+' sq ft';
+  qPrice.textContent='$'+Math.round(sqft*29).toLocaleString();
 }
 
 // ─── Reset ────────────────────────────────────────────────────────────────────
 function doReset() {
-  img = null; overlay = null; isDragging = false; dragStart = null;
-  canvas.width = 0; canvas.height = 0; fileInput.value = '';
-  canvasSection.style.display = 'none';
-  uploadZone.style.display = '';
-  wInput.value = ''; hInput.value = '';
+  img=null; overlay=null; action=null; dragStart=null; showShutters=true;
+  canvas.width=0; canvas.height=0; fileInput.value='';
+  canvasSection.style.display='none'; uploadZone.style.display='';
+  wInput.value=''; hInput.value='';
   wInput.classList.remove('field-err'); wErr.classList.remove('show');
   hInput.classList.remove('field-err'); hErr.classList.remove('show');
-  quoteSection.style.display = 'none';
+  quoteSection.style.display='none';
+  document.getElementById('btnAfter').classList.add('active');
+  document.getElementById('btnBefore').classList.remove('active');
 }
 resetBtn.addEventListener('click', doReset);
 document.getElementById('startOverBtn').addEventListener('click', doReset);
 
 // ─── Quote modal ──────────────────────────────────────────────────────────────
 quoteBtn.addEventListener('click', () => {
-  const w = parseFloat(wInput.value) || 0;
-  const h = parseFloat(hInput.value) || 0;
-  const tot = Math.round((w * h / 144) * 29);
-
-  document.getElementById('mSize').textContent   = w + '″ × ' + h + '″';
+  const w=parseFloat(wInput.value)||0, h=parseFloat(hInput.value)||0;
+  const tot=Math.round((w*h/144)*29);
+  document.getElementById('mSize').textContent   = w+'″ × '+h+'″';
   document.getElementById('mType').textContent   = shutterSel.options[shutterSel.selectedIndex].text;
   document.getElementById('mLouver').textContent = louverSel.options[louverSel.selectedIndex].text.split(' —')[0];
-  document.getElementById('mColor').textContent  = document.querySelector('.color-swatch.sel')?.title || 'White';
+  document.getElementById('mColor').textContent  = document.querySelector('.color-swatch.sel')?.title||'White';
   document.getElementById('mMount').textContent  = mountSel.options[mountSel.selectedIndex].text;
-  document.getElementById('mPrice').textContent  = '$' + tot.toLocaleString();
-  document.getElementById('multiNote').style.display = document.getElementById('multiWin').checked ? 'block' : 'none';
-
-  quoteModal.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.getElementById('mPrice').textContent  = '$'+tot.toLocaleString();
+  document.getElementById('multiNote').style.display = document.getElementById('multiWin').checked?'block':'none';
+  quoteModal.classList.add('open'); document.body.style.overflow='hidden';
 });
 
-function closeModal() { quoteModal.classList.remove('open'); document.body.style.overflow = ''; }
-document.getElementById('closeModal').addEventListener('click', closeModal);
-quoteModal.addEventListener('click', e => { if (e.target === quoteModal) closeModal(); });
+function closeModal(){quoteModal.classList.remove('open');document.body.style.overflow='';}
+document.getElementById('closeModal').addEventListener('click',closeModal);
+quoteModal.addEventListener('click',e=>{if(e.target===quoteModal)closeModal();});
 
-// ─── Submit quote ─────────────────────────────────────────────────────────────
-document.getElementById('submitQuote').addEventListener('click', async () => {
+// ─── Submit quote → mailto ────────────────────────────────────────────────────
+document.getElementById('submitQuote').addEventListener('click', () => {
   const name  = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const phone = document.getElementById('cPhone').value.trim();
-  if (!name || !email || !phone) { toast('Please fill in your name, email, and phone number.'); return; }
+  if (!name||!email||!phone){toast('Please fill in your name, email, and phone number.');return;}
 
-  const w = parseFloat(wInput.value) || 0, h = parseFloat(hInput.value) || 0;
-  const payload = {
-    name, email, phone,
-    width_in: w, height_in: h,
-    sq_ft: ((w * h) / 144).toFixed(2),
-    total_price: Math.round((w * h / 144) * 29),
-    shutter_type: shutterSel.value, louver_size: louverSel.value,
-    mount_type: mountSel.value, color: shutterColor,
-    multiple_windows: document.getElementById('multiWin').checked,
-    source: 'shutter-visualizer', timestamp: new Date().toISOString(),
-  };
-  try { await fetch(GHL_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), mode:'no-cors' }); } catch(_) {}
+  const w     = parseFloat(wInput.value)||0;
+  const h     = parseFloat(hInput.value)||0;
+  const sqft  = ((w*h)/144).toFixed(2);
+  const total = Math.round((w*h/144)*29);
+  const multi = document.getElementById('multiWin').checked;
+  const type  = shutterSel.options[shutterSel.selectedIndex].text;
+  const louver= louverSel.options[louverSel.selectedIndex].text.split(' —')[0];
+  const color = document.querySelector('.color-swatch.sel')?.title||'White';
+  const mount = mountSel.options[mountSel.selectedIndex].text;
+
+  const subject = 'Shutter Quote Request — '+name;
+  const body =
+`New shutter quote request from the ShuttersDirectUSA Visualizer.
+
+CONTACT INFO
+Name:   ${name}
+Email:  ${email}
+Phone:  ${phone}
+
+WINDOW DETAILS
+Size:    ${w}" wide × ${h}" tall
+Area:    ${sqft} sq ft
+Type:    ${type}
+Louver:  ${louver}
+Color:   ${color}
+Mount:   ${mount}
+
+ESTIMATED PRICE: $${total.toLocaleString()}
+
+Multiple windows / complex order: ${multi ? 'YES' : 'No'}
+
+Submitted: ${new Date().toLocaleString()}`;
+
+  const mailto = `mailto:${EMAIL_TO}?cc=${encodeURIComponent(EMAIL_CC)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+
   closeModal();
-  toast('Quote submitted! We\'ll be in touch shortly. 🎉');
+  toast('Opening email — review and hit Send! 📧');
 });
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3500);
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
 }
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 let resizeTimer;
-window.addEventListener('resize', () => {
+window.addEventListener('resize',()=>{
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    if (!img) return;
-    const oldW = canvas.width;
-    sizeCanvas();
-    if (overlay && oldW > 0) {
-      const ratio = canvas.width / oldW;
-      overlay.x *= ratio; overlay.y *= ratio;
-      overlay.w *= ratio; overlay.h *= ratio;
+  resizeTimer=setTimeout(()=>{
+    if(!img)return;
+    const oldW=canvas.width; sizeCanvas();
+    if(overlay&&oldW>0){
+      const r=canvas.width/oldW;
+      overlay.x*=r; overlay.y*=r; overlay.w*=r; overlay.h*=r;
     }
     drawCanvas();
-  }, 120);
+  },120);
 });
 </script>
 </body>
