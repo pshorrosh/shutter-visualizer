@@ -364,11 +364,14 @@ function loadFile(file) {
     tmp.getContext('2d').drawImage(raw, 0, 0, w, h);
     img = new Image();
     img.onload = () => {
-      sizeCanvas();
-      initOverlay();
       uploadZone.style.display = 'none';
       canvasSection.style.display = 'block';
-      drawCanvas();
+      // Let the browser lay out the now-visible container before measuring its width
+      requestAnimationFrame(() => {
+        sizeCanvas();
+        initOverlay();
+        drawCanvas();
+      });
     };
     img.src = tmp.toDataURL('image/jpeg', 0.88);
   };
