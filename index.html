@@ -770,43 +770,40 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
   submitBtn.disabled = true;
 
   try {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:    EMAIL_TO,
-      cc_emails:   EMAIL_CC + ',' + email,   // CC all staff + sender
-      reply_to:    email,
-      from_name:   name,
-      from_email:  email,
-      phone:       phone,
-      size:        w + '" × ' + h + '"',
-      area:        sqft + ' sq ft',
+      to_email:     EMAIL_TO,
+      reply_to:     email,
+      name:         name,          // matches {{name}} in EmailJS From Name field
+      from_name:    name,          // matches {{from_name}} in subject/body
+      from_email:   email,
+      phone:        phone,
+      size:         w + '" × ' + h + '"',
+      area:         sqft + ' sq ft',
       shutter_type: type,
-      louver:      louver,
-      color:       color,
-      mount:       mount,
-      our_price:   '$' + our.toLocaleString(),
-      retail_price:'$' + retail.toLocaleString(),
-      you_save:    '$' + saves.toLocaleString(),
-      multiple:    multi ? 'YES — multiple windows / complex order' : 'No',
-      submitted:   new Date().toLocaleString(),
+      louver:       louver,
+      color:        color,
+      mount:        mount,
+      our_price:    '$' + our.toLocaleString(),
+      retail_price: '$' + retail.toLocaleString(),
+      you_save:     '$' + saves.toLocaleString(),
+      multiple:     multi ? 'YES — multiple windows / complex order' : 'No',
+      submitted:    new Date().toLocaleString(),
     });
     closeModal();
     toast('Quote sent! We\'ll be in touch shortly. 🎉');
   } catch (err) {
     console.error('EmailJS error:', err);
-    // Fallback to mailto if EmailJS not yet configured
-    const subject = 'Shutter Quote Request — ' + name;
-    const body = `New quote request from ShuttersDirectUSA Visualizer\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nSize: ${w}" × ${h}"\nArea: ${sqft} sq ft\nType: ${type}\nLouver: ${louver}\nColor: ${color}\nMount: ${mount}\n\nOur Price: $${our.toLocaleString()}\nRetail Price: $${retail.toLocaleString()}\nCustomer Saves: $${saves.toLocaleString()}\n\nMultiple windows: ${multi ? 'YES' : 'No'}\nSubmitted: ${new Date().toLocaleString()}`;
-    window.location.href = `mailto:${EMAIL_TO}?cc=${encodeURIComponent(EMAIL_CC + ',' + email)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    closeModal();
-    toast('Opening email as backup — hit Send to submit. 📧');
-  } finally {
     submitBtn.textContent = 'Submit & Request My Quote →';
     submitBtn.disabled = false;
+    toast('Send failed: ' + (err?.text || err?.message || 'Check connection and try again.'));
+    return;
   }
+  submitBtn.textContent = 'Submit & Request My Quote →';
+  submitBtn.disabled = false;
 });
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
+emailjs.init(EMAILJS_PUBLIC_KEY);  // initialize once at page load
 updateQuote(); // pre-calculate with default 36×48 values
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
