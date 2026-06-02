@@ -839,7 +839,7 @@ document.getElementById('closeModal').addEventListener('click',closeModal);
 quoteModal.addEventListener('click',e=>{if(e.target===quoteModal)closeModal();});
 
 // ─── GoHighLevel webhook ──────────────────────────────────────────────────────
-const GHL_WEBHOOK = 'https://services.leadconnectorhq.com/hooks/i8iT9RfUSmKENvDQr2f1/webhook-trigger/54a85e9d-0b33-47bb-8214-dfc5c132bd8e';
+const GHL_WEBHOOK = 'https://services.leadconnectorhq.com/hooks/i8iT9RfUSmKENvDQr2f1/webhook-trigger/4c7046a1-e98c-41c6-933c-c3c688acc5ea';
 
 // ─── EmailJS config — fill these in after EmailJS setup ──────────────────────
 const EMAILJS_PUBLIC_KEY  = 'I7o_X3ZNAAwBylzYT';
@@ -870,34 +870,15 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
   submitBtn.textContent = 'Sending…';
   submitBtn.disabled = true;
 
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:     EMAIL_TO,
-      reply_to:     email,
-      name:         name,          // matches {{name}} in EmailJS From Name field
-      from_name:    name,          // matches {{from_name}} in subject/body
-      from_email:   email,
-      phone:        phone,
-      size:         w + '" × ' + h + '"',
-      area:         sqft + ' sq ft',
-      shutter_type: type,
-      louver:       louver,
-      color:        color,
-      mount:        mount,
-      our_price:    '$' + our.toLocaleString(),
-      retail_price: '$' + retail.toLocaleString(),
-      you_save:     '$' + saves.toLocaleString(),
-      zip_code:     zip,
-      num_panels:   numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
-      multiple:     multi ? 'YES — multiple windows / complex order' : 'No',
-      submitted:    new Date().toLocaleString(),
-    });
-    // ── Also send to GoHighLevel to create/update contact ──
-    const ghlPayload = {
+  // ── 1. Fire GHL webhook immediately — always, no blocking ──
+  fetch(GHL_WEBHOOK, {
+    method:  'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
       firstName:        name.split(' ')[0],
       lastName:         name.split(' ').slice(1).join(' ') || '',
-      email:            email,
-      phone:            phone,
+      email,
+      phone,
       postalCode:       zip,
       window_size:      w + '" × ' + h + '"',
       window_area:      sqft + ' sq ft',
@@ -912,23 +893,38 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
       multiple_windows: multi ? 'Yes' : 'No',
       lead_source:      'ShuttersDirectUSA Visualizer',
       submitted_at:     new Date().toISOString(),
-    };
-    // GHL supports CORS — send proper JSON
-    fetch(GHL_WEBHOOK, {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify(ghlPayload),
-    }).catch(()=>{});
+    }),
+  }).catch(()=>{});
 
-    closeModal();
-    toast('Quote sent! We\'ll be in touch shortly. 🎉');
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    submitBtn.textContent = 'Submit & Request My Quote →';
-    submitBtn.disabled = false;
-    toast('Send failed: ' + (err?.text || err?.message || 'Check connection and try again.'));
-    return;
+  // ── 2. Send email via EmailJS — failure doesn't block GHL ──
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:     EMAIL_TO,
+      reply_to:     email,
+      name,
+      from_name:    name,
+      from_email:   email,
+      phone,
+      size:         w + '" × ' + h + '"',
+      area:         sqft + ' sq ft',
+      shutter_type: type,
+      louver,
+      color,
+      mount,
+      our_price:    '$' + our.toLocaleString(),
+      retail_price: '$' + retail.toLocaleString(),
+      you_save:     '$' + saves.toLocaleString(),
+      zip_code:     zip,
+      num_panels:   numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
+      multiple:     multi ? 'YES — multiple windows / complex order' : 'No',
+      submitted:    new Date().toLocaleString(),
+    });
+  } catch (emailErr) {
+    console.warn('EmailJS:', emailErr);
   }
+
+  closeModal();
+  toast('Quote sent! We\'ll be in touch shortly. 🎉');
   submitBtn.textContent = 'Submit & Request My Quote →';
   submitBtn.disabled = false;
 });
