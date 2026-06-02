@@ -838,6 +838,9 @@ function closeModal(){quoteModal.classList.remove('open');document.body.style.ov
 document.getElementById('closeModal').addEventListener('click',closeModal);
 quoteModal.addEventListener('click',e=>{if(e.target===quoteModal)closeModal();});
 
+// ─── GoHighLevel webhook ──────────────────────────────────────────────────────
+const GHL_WEBHOOK = 'https://services.leadconnectorhq.com/hooks/i8iT9RfUSmKENvDQr2f1/webhook-trigger/54a85e9d-0b33-47bb-8214-dfc5c132bd8e';
+
 // ─── EmailJS config — fill these in after EmailJS setup ──────────────────────
 const EMAILJS_PUBLIC_KEY  = 'I7o_X3ZNAAwBylzYT';
 const EMAILJS_SERVICE_ID  = 'service_0n706lk';
@@ -889,6 +892,34 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
       multiple:     multi ? 'YES — multiple windows / complex order' : 'No',
       submitted:    new Date().toLocaleString(),
     });
+    // ── Also send to GoHighLevel to create/update contact ──
+    fetch(GHL_WEBHOOK, {
+      method:  'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        firstName:    name.split(' ')[0],
+        lastName:     name.split(' ').slice(1).join(' ') || '',
+        email:        email,
+        phone:        phone,
+        postalCode:   zip,
+        // Window & order details as custom fields
+        window_size:       w + '" × ' + h + '"',
+        window_area:       sqft + ' sq ft',
+        shutter_type:      type,
+        louver_size:       louver,
+        shutter_color:     color,
+        mount_type:        mount,
+        num_panels:        numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
+        our_price:         '$' + our.toLocaleString(),
+        retail_price:      '$' + retail.toLocaleString(),
+        customer_savings:  '$' + saves.toLocaleString(),
+        multiple_windows:  multi ? 'Yes' : 'No',
+        lead_source:       'ShuttersDirectUSA Visualizer',
+        submitted_at:      new Date().toISOString(),
+      }),
+      mode: 'no-cors',
+    }).catch(()=>{});  // silent fail — email already sent
+
     closeModal();
     toast('Quote sent! We\'ll be in touch shortly. 🎉');
   } catch (err) {
