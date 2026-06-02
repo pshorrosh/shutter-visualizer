@@ -83,6 +83,12 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .trust{margin-top:14px;background:#f0f8f4;border:1px solid #c8e6d4;border-radius:8px;padding:12px 14px;font-size:.82em;color:#2a6a4a;line-height:1.7;}
 .trust strong{color:#1a4a2a;}
 
+/* Panel count selector */
+.panel-btns{display:flex;gap:6px;margin-top:4px;}
+.panel-btn{flex:1;padding:8px 4px;border:1.5px solid #dde;background:#fafafa;border-radius:7px;font-size:.9em;font-weight:700;color:#5a7a7a;cursor:pointer;transition:.2s;}
+.panel-btn:hover{border-color:#2d5a5a;color:#2d5a5a;}
+.panel-btn.active{background:#2d5a5a;color:#fff;border-color:#2d5a5a;}
+
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a3a3a;color:#fff;padding:12px 22px;border-radius:30px;font-size:.88em;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:transform .3s;z-index:9999;pointer-events:none;max-width:90vw;text-align:center;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -177,6 +183,16 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
         <option value="arch">Arch Top</option>
         <option value="sunburst">Deluxe Sunburst</option>
       </select>
+    </div>
+
+    <div class="ctrl-group" style="margin-bottom:14px;">
+      <label>Number of Panels</label>
+      <div class="panel-btns" id="panelBtns">
+        <button class="panel-btn" data-panels="1">1 Panel</button>
+        <button class="panel-btn active" data-panels="2">2 Panels</button>
+        <button class="panel-btn" data-panels="3">3 Panels</button>
+        <button class="panel-btn" data-panels="4">4 Panels</button>
+      </div>
     </div>
 
     <div class="ctrl-group" style="margin-bottom:14px;">
@@ -317,6 +333,7 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
         <input type="text"  id="cName"  placeholder="Full Name *" autocomplete="name">
         <input type="email" id="cEmail" placeholder="Email Address *" autocomplete="email">
         <input type="tel"   id="cPhone" placeholder="Phone Number *" autocomplete="tel">
+        <input type="text"  id="cZip"   placeholder="Zip Code *" autocomplete="postal-code" inputmode="numeric" maxlength="10">
         <button class="btn btn-primary" id="submitQuote" style="padding:13px;">Submit &amp; Request My Quote &rarr;</button>
       </div>
     </div>
@@ -348,12 +365,13 @@ const quoteModal    = document.getElementById('quoteModal');
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let img          = null;
-let overlay      = null;    // { x, y, w, h }
+let overlay      = null;    // { tl, tr, br, bl } — each is {x,y}, free-form quad
 let showShutters = true;
-let action       = null;    // null | 'move' | 'tl'|'tr'|'bl'|'br'
-let dragStart    = null;    // { mx, my, ox, oy, ow, oh }
+let action       = null;    // null | 'move' | 'tl'|'tr'|'br'|'bl'
+let dragStart    = null;    // { mx, my, otl, otr, obr, obl }
 let shutterColor = '#f5f5f5';
-const HS         = 14;      // handle half-size in canvas px
+let numPanels    = 2;
+const HS         = 18;      // handle hit-radius in canvas px
 
 // Email recipients
 const EMAIL_TO  = 'tom@polydesign.com';
@@ -397,7 +415,7 @@ function sizeCanvas() {
   canvas.height = Math.round(maxW * (img.height / img.width));
 }
 
-// ─── Overlay ──────────────────────────────────────────────────────────────────
+// ─── Overlay (free-form quad) ──────────────────────────────────────────────────
 function overlayAspect() {
   const mw = parseFloat(wInput.value), mh = parseFloat(hInput.value);
   return (mw > 0 && mh > 0) ? mh / mw : 1.5;
@@ -406,98 +424,94 @@ function overlayAspect() {
 function initOverlay() {
   const ow = Math.round(canvas.width * 0.55);
   const oh = Math.round(ow * overlayAspect());
-  overlay = {
-    x: Math.round((canvas.width  - ow) / 2),
-    y: Math.round((canvas.height - oh) / 2),
-    w: ow, h: oh,
-  };
+  const x  = Math.round((canvas.width  - ow) / 2);
+  const y  = Math.round((canvas.height - oh) / 2);
+  overlay  = { tl:{x,y}, tr:{x:x+ow,y}, br:{x:x+ow,y:y+oh}, bl:{x,y:y+oh} };
 }
 
 function refreshOverlayAspect() {
   if (!overlay) return;
-  const cx = overlay.x + overlay.w / 2, cy = overlay.y + overlay.h / 2;
-  overlay.h = Math.round(overlay.w * overlayAspect());
-  overlay.x = Math.round(cx - overlay.w / 2);
-  overlay.y = Math.round(cy - overlay.h / 2);
+  // Rebuild as rect centred on current quad centroid, preserving width
+  const cx = (overlay.tl.x+overlay.tr.x+overlay.br.x+overlay.bl.x)/4;
+  const cy = (overlay.tl.y+overlay.tr.y+overlay.br.y+overlay.bl.y)/4;
+  const topW = Math.hypot(overlay.tr.x-overlay.tl.x, overlay.tr.y-overlay.tl.y);
+  const botW = Math.hypot(overlay.br.x-overlay.bl.x, overlay.br.y-overlay.bl.y);
+  const ow = (topW+botW)/2, oh = ow * overlayAspect();
+  const x = cx-ow/2, y = cy-oh/2;
+  overlay = { tl:{x,y}, tr:{x:x+ow,y}, br:{x:x+ow,y:y+oh}, bl:{x,y:y+oh} };
 }
 
-// ─── Handle positions ─────────────────────────────────────────────────────────
-function getHandles() {
-  if (!overlay) return {};
-  const {x, y, w, h} = overlay;
-  return { tl:{x,y}, tr:{x:x+w,y}, bl:{x,y:y+h}, br:{x:x+w,y:y+h} };
+// Point-in-quad (ray-casting)
+function pointInQuad(pt) {
+  if (!overlay) return false;
+  const corners = [overlay.tl, overlay.tr, overlay.br, overlay.bl];
+  let inside = false, j = corners.length - 1;
+  for (let i = 0; i < corners.length; j = i++) {
+    const {x:xi,y:yi} = corners[i], {x:xj,y:yj} = corners[j];
+    if (((yi>pt.y)!==(yj>pt.y)) && pt.x < (xj-xi)*(pt.y-yi)/(yj-yi)+xi) inside=!inside;
+  }
+  return inside;
 }
 
 function hitTest(pt) {
   if (!overlay) return null;
-  const handles = getHandles();
-  for (const [id, hp] of Object.entries(handles)) {
-    if (Math.abs(pt.x - hp.x) <= HS && Math.abs(pt.y - hp.y) <= HS) return id;
+  for (const id of ['tl','tr','br','bl']) {
+    const h = overlay[id];
+    if (Math.hypot(pt.x-h.x, pt.y-h.y) <= HS) return id;
   }
-  // Hit body
-  if (pt.x > overlay.x && pt.x < overlay.x + overlay.w &&
-      pt.y > overlay.y && pt.y < overlay.y + overlay.h) return 'move';
-  return null;
+  return pointInQuad(pt) ? 'move' : null;
 }
 
 // ─── Coordinate helper ────────────────────────────────────────────────────────
 function canvasCoords(cx, cy) {
   const r = canvas.getBoundingClientRect();
-  return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height) };
+  return { x:(cx-r.left)*(canvas.width/r.width), y:(cy-r.top)*(canvas.height/r.height) };
 }
 
 // ─── Pointer events ───────────────────────────────────────────────────────────
-canvas.addEventListener('touchstart', e => { e.preventDefault(); pointerDown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); pointerMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-canvas.addEventListener('touchend',   e => { e.preventDefault(); pointerUp(); }, { passive: false });
+canvas.addEventListener('touchstart', e=>{e.preventDefault();pointerDown(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+canvas.addEventListener('touchmove',  e=>{e.preventDefault();pointerMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+canvas.addEventListener('touchend',   e=>{e.preventDefault();pointerUp();},{passive:false});
 
-canvas.addEventListener('mousedown',  e => pointerDown(e.clientX, e.clientY));
-canvas.addEventListener('mousemove',  e => {
-  if (action) { pointerMove(e.clientX, e.clientY); return; }
+canvas.addEventListener('mousedown',  e=>pointerDown(e.clientX,e.clientY));
+canvas.addEventListener('mousemove',  e=>{
+  if (action){pointerMove(e.clientX,e.clientY);return;}
   if (!overlay) return;
-  const hit = hitTest(canvasCoords(e.clientX, e.clientY));
-  canvas.style.cursor = hit === 'move' ? 'move' : hit ? 'nwse-resize' : 'default';
+  const hit = hitTest(canvasCoords(e.clientX,e.clientY));
+  canvas.style.cursor = hit==='move'?'move':hit?'crosshair':'default';
 });
-canvas.addEventListener('mouseup',    () => pointerUp());
-canvas.addEventListener('mouseleave', () => { action = null; dragStart = null; canvas.style.cursor = 'default'; });
+canvas.addEventListener('mouseup',    ()=>pointerUp());
+canvas.addEventListener('mouseleave', ()=>{action=null;dragStart=null;canvas.style.cursor='default';});
 
 function pointerDown(cx, cy) {
-  if (!img || !overlay) return;
-  const pt  = canvasCoords(cx, cy);
-  const hit = hitTest(pt);
+  if (!img||!overlay) return;
+  const pt = canvasCoords(cx,cy), hit = hitTest(pt);
   if (!hit) return;
-  action    = hit;
-  dragStart = { mx: pt.x, my: pt.y, ox: overlay.x, oy: overlay.y, ow: overlay.w, oh: overlay.h };
+  action = hit;
+  dragStart = {
+    mx:pt.x, my:pt.y,
+    otl:{...overlay.tl}, otr:{...overlay.tr},
+    obr:{...overlay.br}, obl:{...overlay.bl},
+  };
 }
 
 function pointerMove(cx, cy) {
-  if (!action || !dragStart) return;
-  const pt = canvasCoords(cx, cy);
-  const dx = pt.x - dragStart.mx, dy = pt.y - dragStart.my;
-  const MIN = 40;
-
+  if (!action||!dragStart) return;
+  const pt = canvasCoords(cx,cy);
+  const dx = pt.x-dragStart.mx, dy = pt.y-dragStart.my;
   if (action === 'move') {
-    overlay.x = dragStart.ox + dx;
-    overlay.y = dragStart.oy + dy;
+    overlay.tl = {x:dragStart.otl.x+dx, y:dragStart.otl.y+dy};
+    overlay.tr = {x:dragStart.otr.x+dx, y:dragStart.otr.y+dy};
+    overlay.br = {x:dragStart.obr.x+dx, y:dragStart.obr.y+dy};
+    overlay.bl = {x:dragStart.obl.x+dx, y:dragStart.obl.y+dy};
   } else {
-    let {ox, oy, ow, oh} = dragStart;
-    if (action === 'tl') {
-      overlay.x = ox + dx; overlay.y = oy + dy;
-      overlay.w = Math.max(MIN, ow - dx); overlay.h = Math.max(MIN, oh - dy);
-    } else if (action === 'tr') {
-      overlay.y = oy + dy;
-      overlay.w = Math.max(MIN, ow + dx); overlay.h = Math.max(MIN, oh - dy);
-    } else if (action === 'bl') {
-      overlay.x = ox + dx;
-      overlay.w = Math.max(MIN, ow - dx); overlay.h = Math.max(MIN, oh + dy);
-    } else if (action === 'br') {
-      overlay.w = Math.max(MIN, ow + dx); overlay.h = Math.max(MIN, oh + dy);
-    }
+    // Move individual corner freely — enables perspective skew
+    overlay[action] = {x:dragStart['o'+action].x+dx, y:dragStart['o'+action].y+dy};
   }
   drawCanvas();
 }
 
-function pointerUp() { action = null; dragStart = null; }
+function pointerUp() { action=null; dragStart=null; }
 
 // ─── Before / After toggle ────────────────────────────────────────────────────
 document.getElementById('btnAfter').addEventListener('click', () => {
@@ -513,6 +527,30 @@ document.getElementById('btnBefore').addEventListener('click', () => {
   drawCanvas();
 });
 
+// ─── Quad geometry helpers ────────────────────────────────────────────────────
+// Bilinear interpolation: s=0→1 left→right, t=0→1 top→bottom
+function lerp2(a, b, t) { return {x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t}; }
+function qpt(q, s, t)   { return lerp2(lerp2(q.tl,q.tr,s), lerp2(q.bl,q.br,s), t); }
+
+// Define a canvas path for a quad region [s0,s1]×[t0,t1]
+function qpath(c, q, s0, s1, t0, t1) {
+  const a=qpt(q,s0,t0), b=qpt(q,s1,t0), cc=qpt(q,s1,t1), d=qpt(q,s0,t1);
+  c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.lineTo(cc.x,cc.y); c.lineTo(d.x,d.y); c.closePath();
+}
+
+// Vertical gradient spanning a quad region
+function qvgrad(c, q, s0, s1, t0, t1) {
+  const ms=(s0+s1)/2, p0=qpt(q,ms,t0), p1=qpt(q,ms,t1);
+  return c.createLinearGradient(p0.x,p0.y,p1.x,p1.y);
+}
+
+// Expand a quad outward by fractional amounts
+function expandQuad(q, fx, fy) {
+  const cx=(q.tl.x+q.tr.x+q.br.x+q.bl.x)/4, cy=(q.tl.y+q.tr.y+q.br.y+q.bl.y)/4;
+  const e = p => ({x:cx+(p.x-cx)*(1+fx), y:cy+(p.y-cy)*(1+fy)});
+  return {tl:e(q.tl), tr:e(q.tr), br:e(q.br), bl:e(q.bl)};
+}
+
 // ─── Draw ─────────────────────────────────────────────────────────────────────
 function drawCanvas() {
   if (!img || !overlay) return;
@@ -520,135 +558,193 @@ function drawCanvas() {
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
   if (showShutters) {
-    const { x: x0, y: y0, w: sw, h: sh } = overlay;
     const mount = mountSel.value, type = shutterSel.value;
+    const drawQ = mount === 'outside' ? expandQuad(overlay, .07, .05) : overlay;
 
-    let ox = x0, oy = y0, ow = sw, oh = sh;
-    if (mount === 'outside') {
-      const ex = sw * .07, ey = sh * .05;
-      ox -= ex; oy -= ey; ow += ex * 2; oh += ey * 2;
-    }
-
+    // Clip to quad
     ctx.save();
-    ctx.beginPath(); ctx.rect(ox, oy, ow, oh); ctx.clip();
-    const panelW = ow / 2;
-    if (type === 'arch') {
-      drawArchPanel(ctx, ox, oy, panelW, oh, shutterColor);
-      drawArchPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
-    } else if (type === 'sunburst') {
-      drawSunburstPanel(ctx, ox, oy, ow, oh, shutterColor);
-    } else {
-      drawPlantationPanel(ctx, ox, oy, panelW, oh, shutterColor);
-      drawPlantationPanel(ctx, ox + panelW, oy, panelW, oh, shutterColor);
+    ctx.beginPath();
+    ctx.moveTo(drawQ.tl.x,drawQ.tl.y); ctx.lineTo(drawQ.tr.x,drawQ.tr.y);
+    ctx.lineTo(drawQ.br.x,drawQ.br.y); ctx.lineTo(drawQ.bl.x,drawQ.bl.y);
+    ctx.closePath(); ctx.clip();
+
+    for (let p = 0; p < numPanels; p++) {
+      const s0 = p/numPanels, s1 = (p+1)/numPanels;
+      const pq = { tl:qpt(drawQ,s0,0), tr:qpt(drawQ,s1,0), br:qpt(drawQ,s1,1), bl:qpt(drawQ,s0,1) };
+      if      (type === 'arch')     drawArchPanel(ctx, pq, shutterColor);
+      else if (type === 'sunburst') drawSunburstPanel(ctx, pq, shutterColor);
+      else                          drawPlantationPanel(ctx, pq, shutterColor);
     }
     ctx.restore();
   }
 
-  // Overlay border
+  // Quad outline
   ctx.save();
-  ctx.strokeStyle = showShutters ? 'rgba(255,255,255,.45)' : 'rgba(45,90,90,.7)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([5, 4]);
-  ctx.strokeRect(overlay.x, overlay.y, overlay.w, overlay.h);
-  ctx.setLineDash([]);
+  ctx.strokeStyle = showShutters ? 'rgba(255,255,255,.5)' : 'rgba(45,90,90,.8)';
+  ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  ctx.moveTo(overlay.tl.x,overlay.tl.y); ctx.lineTo(overlay.tr.x,overlay.tr.y);
+  ctx.lineTo(overlay.br.x,overlay.br.y); ctx.lineTo(overlay.bl.x,overlay.bl.y);
+  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
   ctx.restore();
 
   // Corner handles
-  const handles = getHandles();
-  for (const hp of Object.values(handles)) {
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#2d5a5a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(hp.x, hp.y, 7, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
+  for (const id of ['tl','tr','br','bl']) {
+    const h = overlay[id];
+    ctx.fillStyle   = id === action ? '#2d5a5a' : '#fff';
+    ctx.strokeStyle = '#2d5a5a'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(h.x, h.y, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   }
 }
 
-// ─── Shutter rendering ────────────────────────────────────────────────────────
+// ─── Shutter rendering (perspective-aware quad versions) ─────────────────────
 function lv(color, pct) {
-  const n = parseInt(color.replace('#',''), 16), amt = Math.round(2.55 * pct);
-  const cl = v => Math.max(0, Math.min(255, v));
-  const r = cl((n >> 16) + amt), g = cl(((n >> 8) & 0xff) + amt), b = cl((n & 0xff) + amt);
-  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  const n=parseInt(color.replace('#',''),16), amt=Math.round(2.55*pct);
+  const cl=v=>Math.max(0,Math.min(255,v));
+  const r=cl((n>>16)+amt), g=cl(((n>>8)&0xff)+amt), b=cl((n&0xff)+amt);
+  return '#'+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1);
 }
 
-function drawPlantationPanel(c, x, y, w, h, color) {
+function drawPlantationPanel(c, q, color) {
   const louverIn = parseFloat(louverSel.value);
   const winH     = parseFloat(hInput.value) || 48;
-  const louverPx = Math.max(10, (h / winH) * louverIn);
-  const stileW   = Math.max(5, Math.min(16, w * .08));
-  const railH    = Math.max(6, Math.min(20, h * .055));
-  const innerX   = x + stileW, innerW = w - stileW * 2;
-  const innerY   = y + railH,  innerH = h - railH * 2;
 
-  const sg = c.createLinearGradient(x, y, x + stileW, y);
-  sg.addColorStop(0, lv(color,18)); sg.addColorStop(.5, lv(color,6)); sg.addColorStop(1, lv(color,-6));
-  c.fillStyle = sg;
-  c.fillRect(x, y, stileW, h); c.fillRect(x + w - stileW, y, stileW, h);
+  // Estimate pixel height for louver scaling
+  const lh = (Math.hypot(q.bl.x-q.tl.x,q.bl.y-q.tl.y)+Math.hypot(q.br.x-q.tr.x,q.br.y-q.tr.y))/2;
+  const lw = (Math.hypot(q.tr.x-q.tl.x,q.tr.y-q.tl.y)+Math.hypot(q.br.x-q.bl.x,q.br.y-q.bl.y))/2;
+  const louverPx = Math.max(10, (lh/winH)*louverIn);
 
-  const rg = c.createLinearGradient(x, y, x, y + railH);
-  rg.addColorStop(0, lv(color,14)); rg.addColorStop(1, lv(color,-4));
-  c.fillStyle = rg;
-  c.fillRect(innerX, y, innerW, railH); c.fillRect(innerX, y + h - railH, innerW, railH);
+  const stileS = Math.max(.03, Math.min(.14, 10/lw));   // stile fraction of width
+  const railT  = Math.max(.025, Math.min(.09, 10/lh));  // rail fraction of height
 
-  const nBlades = Math.max(2, Math.round(innerH / louverPx));
-  const slotH = innerH / nBlades, gapH = slotH * .32, bladeH = slotH * .68;
+  // Left stile
+  const sg = qvgrad(c,q,0,stileS,0,1);
+  sg.addColorStop(0,lv(color,18)); sg.addColorStop(.5,lv(color,6)); sg.addColorStop(1,lv(color,-6));
+  qpath(c,q,0,stileS,0,1); c.fillStyle=sg; c.fill();
 
-  for (let i = 0; i < nBlades; i++) {
-    const slotY = innerY + i * slotH, bladeY = slotY + gapH;
-    const gg = c.createLinearGradient(innerX, slotY, innerX, slotY + gapH);
+  // Right stile
+  const sg2 = qvgrad(c,q,1-stileS,1,0,1);
+  sg2.addColorStop(0,lv(color,18)); sg2.addColorStop(.5,lv(color,6)); sg2.addColorStop(1,lv(color,-6));
+  qpath(c,q,1-stileS,1,0,1); c.fillStyle=sg2; c.fill();
+
+  // Top rail
+  const rg = qvgrad(c,q,stileS,1-stileS,0,railT);
+  rg.addColorStop(0,lv(color,14)); rg.addColorStop(1,lv(color,-4));
+  qpath(c,q,stileS,1-stileS,0,railT); c.fillStyle=rg; c.fill();
+
+  // Bottom rail
+  const rg2 = qvgrad(c,q,stileS,1-stileS,1-railT,1);
+  rg2.addColorStop(0,lv(color,14)); rg2.addColorStop(1,lv(color,-4));
+  qpath(c,q,stileS,1-stileS,1-railT,1); c.fillStyle=rg2; c.fill();
+
+  // Louver blades
+  const innerT0=railT, innerT1=1-railT, innerH=lh*(innerT1-innerT0);
+  const nBlades = Math.max(2, Math.round(innerH/louverPx));
+  const slotF   = (innerT1-innerT0)/nBlades;
+  const gapF    = slotF*.32, bladeF = slotF*.68;
+
+  for (let i=0; i<nBlades; i++) {
+    const st=innerT0+i*slotF;
+    const gT0=st, gT1=st+gapF, bT0=gT1, bT1=st+slotF;
+
+    // Gap shadow
+    const gg = qvgrad(c,q,stileS,1-stileS,gT0,gT1);
     gg.addColorStop(0,'rgba(0,0,0,.30)'); gg.addColorStop(.6,'rgba(0,0,0,.14)'); gg.addColorStop(1,'rgba(0,0,0,.04)');
-    c.fillStyle = gg; c.fillRect(innerX, slotY, innerW, gapH);
-    const bg = c.createLinearGradient(innerX, bladeY, innerX, bladeY + bladeH);
-    bg.addColorStop(0,lv(color,32)); bg.addColorStop(.12,lv(color,14)); bg.addColorStop(.55,lv(color,-2)); bg.addColorStop(.88,lv(color,-18)); bg.addColorStop(1,lv(color,-28));
-    c.fillStyle = bg; c.fillRect(innerX, bladeY, innerW, bladeH);
-    c.fillStyle = lv(color,42); c.fillRect(innerX, bladeY, innerW, Math.max(1, bladeH * .06));
-    if (i < nBlades - 1) {
-      const cast = c.createLinearGradient(innerX, slotY + slotH, innerX, slotY + slotH + gapH * .45);
+    qpath(c,q,stileS,1-stileS,gT0,gT1); c.fillStyle=gg; c.fill();
+
+    // Blade
+    const bg = qvgrad(c,q,stileS,1-stileS,bT0,bT1);
+    bg.addColorStop(0,lv(color,32)); bg.addColorStop(.12,lv(color,14));
+    bg.addColorStop(.55,lv(color,-2)); bg.addColorStop(.88,lv(color,-18)); bg.addColorStop(1,lv(color,-28));
+    qpath(c,q,stileS,1-stileS,bT0,bT1); c.fillStyle=bg; c.fill();
+
+    // Highlight
+    c.fillStyle=lv(color,42);
+    qpath(c,q,stileS,1-stileS,bT0,bT0+bladeF*.06); c.fill();
+
+    // Cast shadow
+    if (i<nBlades-1) {
+      const cast=qvgrad(c,q,stileS,1-stileS,bT1,bT1+gapF*.45);
       cast.addColorStop(0,'rgba(0,0,0,.22)'); cast.addColorStop(1,'rgba(0,0,0,0)');
-      c.fillStyle = cast; c.fillRect(innerX, slotY + slotH, innerW, gapH * .45);
+      qpath(c,q,stileS,1-stileS,bT1,bT1+gapF*.45); c.fillStyle=cast; c.fill();
     }
   }
-  c.save(); c.shadowColor='rgba(0,0,0,.35)'; c.shadowBlur=3; c.strokeStyle=lv(color,-32); c.lineWidth=2.5;
-  c.beginPath(); c.moveTo(x+w/2, innerY+4); c.lineTo(x+w/2, innerY+innerH-4); c.stroke(); c.restore();
-  c.strokeStyle=lv(color,-30); c.lineWidth=2; c.strokeRect(x,y,w,h);
+
+  // Tilt rod
+  const rodTop=qpt(q,.5,innerT0+.015), rodBot=qpt(q,.5,innerT1-.015);
+  c.save(); c.shadowColor='rgba(0,0,0,.35)'; c.shadowBlur=3;
+  c.strokeStyle=lv(color,-32); c.lineWidth=2.5;
+  c.beginPath(); c.moveTo(rodTop.x,rodTop.y); c.lineTo(rodBot.x,rodBot.y); c.stroke(); c.restore();
+
+  // Panel border
+  c.strokeStyle=lv(color,-30); c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(q.tl.x,q.tl.y); c.lineTo(q.tr.x,q.tr.y); c.lineTo(q.br.x,q.br.y); c.lineTo(q.bl.x,q.bl.y); c.closePath(); c.stroke();
 }
 
-function drawArchPanel(c, x, y, w, h, color) {
-  const archH = h*.28, archR = w/2;
+function drawArchPanel(c, q, color) {
+  // Bottom 72% — plantation panels
+  const archFrac = .28;
+  const bottomQ  = {tl:qpt(q,0,archFrac), tr:qpt(q,1,archFrac), br:qpt(q,1,1), bl:qpt(q,0,1)};
+  drawPlantationPanel(c, bottomQ, color);
+
+  // Top arch — clip to semicircle
+  const tl=qpt(q,0,archFrac), tr=qpt(q,1,archFrac);
+  const cx=(tl.x+tr.x)/2, cy=(tl.y+tr.y)/2;
+  const archR = Math.hypot(tr.x-tl.x,tr.y-tl.y)/2;
   c.save();
-  c.beginPath(); c.moveTo(x,y+archH); c.arc(x+w/2,y+archH,archR,Math.PI,0,false);
-  c.lineTo(x+w,y+h); c.lineTo(x,y+h); c.closePath(); c.clip();
-  drawPlantationPanel(c,x,y+archH,w,h-archH,color);
-  const ag = c.createRadialGradient(x+w/2,y+archH,0,x+w/2,y+archH,archR);
+  c.beginPath(); c.moveTo(tl.x,tl.y); c.arc(cx,cy,archR,Math.PI,0,false); c.closePath(); c.clip();
+  const ag = c.createRadialGradient(cx,cy,0,cx,cy,archR);
   ag.addColorStop(0,lv(color,20)); ag.addColorStop(1,lv(color,-5));
-  c.fillStyle=ag; c.beginPath(); c.arc(x+w/2,y+archH,archR,Math.PI,0,false); c.closePath(); c.fill();
-  c.strokeStyle=lv(color,-25); c.lineWidth=2; c.beginPath(); c.arc(x+w/2,y+archH,archR,Math.PI,0,false); c.stroke();
+  c.fillStyle=ag; c.fill();
+  c.strokeStyle=lv(color,-25); c.lineWidth=2;
+  c.beginPath(); c.arc(cx,cy,archR,Math.PI,0,false); c.stroke();
   c.restore();
 }
 
-function drawSunburstPanel(c, x, y, w, h, color) {
-  const cx2=x+w/2, topY=y+h*.12, nRays=14, rayLen=Math.max(w,h)*.9;
-  c.save(); c.beginPath(); c.rect(x,y,w,h); c.clip();
-  c.fillStyle=lv(color,-5); c.fillRect(x,y,w,h);
+function drawSunburstPanel(c, q, color) {
+  // Use quad centroid as hub, top-centre as focal point
+  const hub = qpt(q,.5,.12);
+  const lw  = (Math.hypot(q.tr.x-q.tl.x,q.tr.y-q.tl.y)+Math.hypot(q.br.x-q.bl.x,q.br.y-q.bl.y))/2;
+  const lh  = (Math.hypot(q.bl.x-q.tl.x,q.bl.y-q.tl.y)+Math.hypot(q.br.x-q.tr.x,q.br.y-q.tr.y))/2;
+  const rayLen = Math.max(lw,lh)*.9, nRays=14;
+
+  c.save();
+  // Clip to quad
+  c.beginPath(); c.moveTo(q.tl.x,q.tl.y); c.lineTo(q.tr.x,q.tr.y); c.lineTo(q.br.x,q.br.y); c.lineTo(q.bl.x,q.bl.y); c.closePath(); c.clip();
+
+  qpath(c,q,0,1,0,1); c.fillStyle=lv(color,-5); c.fill();
+
   for (let i=0; i<=nRays; i++) {
     const angle=(Math.PI/nRays)*i;
-    const rg=c.createLinearGradient(cx2,topY,cx2+Math.cos(Math.PI-angle)*rayLen,topY+Math.sin(Math.PI-angle)*rayLen);
+    const ex=hub.x+Math.cos(Math.PI-angle)*rayLen, ey=hub.y+Math.sin(Math.PI-angle)*rayLen;
+    const rg=c.createLinearGradient(hub.x,hub.y,ex,ey);
     rg.addColorStop(0,lv(color,25)); rg.addColorStop(.4,lv(color,8)); rg.addColorStop(1,lv(color,-12));
     const bw=rayLen*.045;
-    c.save(); c.translate(cx2,topY); c.rotate(Math.PI-angle);
+    c.save(); c.translate(hub.x,hub.y); c.rotate(Math.PI-angle);
     c.fillStyle=rg; c.fillRect(0,-bw/2,rayLen,bw);
     c.strokeStyle=lv(color,-28); c.lineWidth=.8; c.strokeRect(0,-bw/2,rayLen,bw); c.restore();
   }
-  const hubR=w*.045;
-  const hg=c.createRadialGradient(cx2,topY,0,cx2,topY,hubR);
+  const hubR=lw*.045;
+  const hg=c.createRadialGradient(hub.x,hub.y,0,hub.x,hub.y,hubR);
   hg.addColorStop(0,lv(color,40)); hg.addColorStop(1,lv(color,0));
-  c.fillStyle=hg; c.beginPath(); c.arc(cx2,topY,hubR,0,Math.PI*2); c.fill();
+  c.fillStyle=hg; c.beginPath(); c.arc(hub.x,hub.y,hubR,0,Math.PI*2); c.fill();
   c.strokeStyle=lv(color,-30); c.lineWidth=1.5; c.stroke();
-  c.strokeStyle=lv(color,-25); c.lineWidth=2.5; c.strokeRect(x,y,w,h);
+
+  // Border
+  c.strokeStyle=lv(color,-25); c.lineWidth=2;
+  c.beginPath(); c.moveTo(q.tl.x,q.tl.y); c.lineTo(q.tr.x,q.tr.y); c.lineTo(q.br.x,q.br.y); c.lineTo(q.bl.x,q.bl.y); c.closePath(); c.stroke();
   c.restore();
 }
+
+// ─── Panel count buttons ──────────────────────────────────────────────────────
+document.querySelectorAll('.panel-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.panel-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    numPanels = parseInt(btn.dataset.panels);
+    drawCanvas();
+  });
+});
 
 // ─── Preferences → redraw ─────────────────────────────────────────────────────
 document.querySelectorAll('.color-swatch').forEach(sw => {
@@ -710,7 +806,7 @@ function updateQuote() {
 
 // ─── Reset ────────────────────────────────────────────────────────────────────
 function doReset() {
-  img=null; overlay=null; action=null; dragStart=null; showShutters=true;
+  img=null; overlay=null; action=null; dragStart=null; showShutters=true; numPanels=2;
   canvas.width=0; canvas.height=0; fileInput.value='';
   canvasSection.style.display='none'; uploadZone.style.display='';
   wInput.value=''; hInput.value='';
@@ -719,6 +815,7 @@ function doReset() {
   quoteSection.style.display='none';
   document.getElementById('btnAfter').classList.add('active');
   document.getElementById('btnBefore').classList.remove('active');
+  document.querySelectorAll('.panel-btn').forEach(b => b.classList.toggle('active', b.dataset.panels==='2'));
 }
 resetBtn.addEventListener('click', doReset);
 document.getElementById('startOverBtn').addEventListener('click', doReset);
@@ -751,7 +848,8 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
   const name  = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const phone = document.getElementById('cPhone').value.trim();
-  if (!name||!email||!phone){toast('Please fill in your name, email, and phone number.');return;}
+  const zip   = document.getElementById('cZip').value.trim();
+  if (!name||!email||!phone||!zip){toast('Please fill in all fields including zip code.');return;}
 
   const w      = parseFloat(wInput.value)||0;
   const h      = parseFloat(hInput.value)||0;
@@ -786,6 +884,8 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
       our_price:    '$' + our.toLocaleString(),
       retail_price: '$' + retail.toLocaleString(),
       you_save:     '$' + saves.toLocaleString(),
+      zip_code:     zip,
+      num_panels:   numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
       multiple:     multi ? 'YES — multiple windows / complex order' : 'No',
       submitted:    new Date().toLocaleString(),
     });
@@ -822,7 +922,7 @@ window.addEventListener('resize',()=>{
     const oldW=canvas.width; sizeCanvas();
     if(overlay&&oldW>0){
       const r=canvas.width/oldW;
-      overlay.x*=r; overlay.y*=r; overlay.w*=r; overlay.h*=r;
+      for(const id of['tl','tr','br','bl']){ overlay[id].x*=r; overlay[id].y*=r; }
     }
     drawCanvas();
   },120);
