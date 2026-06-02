@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ShuttersDirectUSA — Shutter Visualizer</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f2f4f4;min-height:100vh;padding:16px;}
@@ -222,12 +223,12 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     <div class="ctrl-row">
       <div class="ctrl-group">
         <label for="wInput">Width (inches) <span style="color:#e74c3c">*</span></label>
-        <input type="number" id="wInput" min="6" max="120" step="0.5" placeholder="e.g. 36">
+        <input type="number" id="wInput" min="6" max="120" step="0.5" value="36">
         <span class="err-msg" id="wErr">Please enter window width.</span>
       </div>
       <div class="ctrl-group">
         <label for="hInput">Height (inches) <span style="color:#e74c3c">*</span></label>
-        <input type="number" id="hInput" min="6" max="120" step="0.5" placeholder="e.g. 48">
+        <input type="number" id="hInput" min="6" max="120" step="0.5" value="48">
         <span class="err-msg" id="hErr">Please enter window height.</span>
       </div>
     </div>
@@ -236,12 +237,18 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 
     <div id="quoteSection" style="display:none;">
       <div class="quote-box" style="margin-top:14px;">
-        <div class="q-label">Your Estimate &mdash; 1 Window</div>
-        <div class="q-price" id="qPrice">$0</div>
+        <div class="q-label">Your Factory-Direct Price &mdash; 1 Window</div>
+        <div style="display:flex;align-items:flex-end;gap:14px;margin-bottom:6px;">
+          <div class="q-price" id="qPrice">$0</div>
+          <div style="margin-bottom:10px;line-height:1.3;">
+            <div style="font-size:.75em;opacity:.7;text-transform:uppercase;letter-spacing:.4px;">Retail elsewhere</div>
+            <div id="qRetail" style="font-size:1.3em;font-weight:700;text-decoration:line-through;opacity:.6;">$0</div>
+          </div>
+        </div>
+        <div id="qSavings" style="background:rgba(125,206,160,.25);border:1px solid rgba(125,206,160,.5);border-radius:6px;padding:5px 10px;font-size:.82em;font-weight:700;color:#7dcea0;margin-bottom:12px;">You save $0 buying factory direct!</div>
         <div class="q-rows">
           <div class="q-row"><span>Size</span><span id="qSize">—</span></div>
           <div class="q-row"><span>Area</span><span id="qArea">—</span></div>
-          <div class="q-row"><span>Rate</span><span>$29 / sq ft</span></div>
           <div class="q-row"><span>Ships in</span><span>2&ndash;3 weeks</span></div>
           <div class="q-row"><span>Warranty</span><span>Lifetime</span></div>
         </div>
@@ -691,9 +698,14 @@ estimateBtn.addEventListener('click', () => {
 function updateQuote() {
   const w=parseFloat(wInput.value)||0, h=parseFloat(hInput.value)||0;
   const sqft=(w*h)/144;
-  qSize.textContent=w+'″ × '+h+'″';
-  qArea.textContent=sqft.toFixed(2)+' sq ft';
-  qPrice.textContent='$'+Math.round(sqft*29).toLocaleString();
+  const ourPrice    = Math.round(sqft * 29);
+  const retailPrice = Math.round(sqft * 49);
+  const savings     = retailPrice - ourPrice;
+  qSize.textContent    = w+'″ × '+h+'″';
+  qArea.textContent    = sqft.toFixed(2)+' sq ft';
+  qPrice.textContent   = '$'+ourPrice.toLocaleString();
+  document.getElementById('qRetail').textContent   = '$'+retailPrice.toLocaleString();
+  document.getElementById('qSavings').textContent  = 'You save $'+savings.toLocaleString()+' buying factory direct!';
 }
 
 // ─── Reset ────────────────────────────────────────────────────────────────────
@@ -729,52 +741,73 @@ function closeModal(){quoteModal.classList.remove('open');document.body.style.ov
 document.getElementById('closeModal').addEventListener('click',closeModal);
 quoteModal.addEventListener('click',e=>{if(e.target===quoteModal)closeModal();});
 
-// ─── Submit quote → mailto ────────────────────────────────────────────────────
-document.getElementById('submitQuote').addEventListener('click', () => {
+// ─── EmailJS config — fill these in after EmailJS setup ──────────────────────
+const EMAILJS_PUBLIC_KEY  = 'I7o_X3ZNAAwBylzYT';
+const EMAILJS_SERVICE_ID  = 'service_07qxwi2';
+const EMAILJS_TEMPLATE_ID = 'm68khh7';
+
+// ─── Submit quote → auto-send via EmailJS ─────────────────────────────────────
+document.getElementById('submitQuote').addEventListener('click', async () => {
   const name  = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const phone = document.getElementById('cPhone').value.trim();
   if (!name||!email||!phone){toast('Please fill in your name, email, and phone number.');return;}
 
-  const w     = parseFloat(wInput.value)||0;
-  const h     = parseFloat(hInput.value)||0;
-  const sqft  = ((w*h)/144).toFixed(2);
-  const total = Math.round((w*h/144)*29);
-  const multi = document.getElementById('multiWin').checked;
-  const type  = shutterSel.options[shutterSel.selectedIndex].text;
-  const louver= louverSel.options[louverSel.selectedIndex].text.split(' —')[0];
-  const color = document.querySelector('.color-swatch.sel')?.title||'White';
-  const mount = mountSel.options[mountSel.selectedIndex].text;
+  const w      = parseFloat(wInput.value)||0;
+  const h      = parseFloat(hInput.value)||0;
+  const sqft   = ((w*h)/144).toFixed(2);
+  const our    = Math.round((w*h/144)*29);
+  const retail = Math.round((w*h/144)*49);
+  const saves  = retail - our;
+  const multi  = document.getElementById('multiWin').checked;
+  const type   = shutterSel.options[shutterSel.selectedIndex].text;
+  const louver = louverSel.options[louverSel.selectedIndex].text.split(' —')[0];
+  const color  = document.querySelector('.color-swatch.sel')?.title||'White';
+  const mount  = mountSel.options[mountSel.selectedIndex].text;
 
-  const subject = 'Shutter Quote Request — '+name;
-  const body =
-`New shutter quote request from the ShuttersDirectUSA Visualizer.
+  const submitBtn = document.getElementById('submitQuote');
+  submitBtn.textContent = 'Sending…';
+  submitBtn.disabled = true;
 
-CONTACT INFO
-Name:   ${name}
-Email:  ${email}
-Phone:  ${phone}
-
-WINDOW DETAILS
-Size:    ${w}" wide × ${h}" tall
-Area:    ${sqft} sq ft
-Type:    ${type}
-Louver:  ${louver}
-Color:   ${color}
-Mount:   ${mount}
-
-ESTIMATED PRICE: $${total.toLocaleString()}
-
-Multiple windows / complex order: ${multi ? 'YES' : 'No'}
-
-Submitted: ${new Date().toLocaleString()}`;
-
-  const mailto = `mailto:${EMAIL_TO}?cc=${encodeURIComponent(EMAIL_CC)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailto;
-
-  closeModal();
-  toast('Opening email — review and hit Send! 📧');
+  try {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:    EMAIL_TO,
+      cc_emails:   EMAIL_CC + ',' + email,   // CC all staff + sender
+      reply_to:    email,
+      from_name:   name,
+      from_email:  email,
+      phone:       phone,
+      size:        w + '" × ' + h + '"',
+      area:        sqft + ' sq ft',
+      shutter_type: type,
+      louver:      louver,
+      color:       color,
+      mount:       mount,
+      our_price:   '$' + our.toLocaleString(),
+      retail_price:'$' + retail.toLocaleString(),
+      you_save:    '$' + saves.toLocaleString(),
+      multiple:    multi ? 'YES — multiple windows / complex order' : 'No',
+      submitted:   new Date().toLocaleString(),
+    });
+    closeModal();
+    toast('Quote sent! We\'ll be in touch shortly. 🎉');
+  } catch (err) {
+    console.error('EmailJS error:', err);
+    // Fallback to mailto if EmailJS not yet configured
+    const subject = 'Shutter Quote Request — ' + name;
+    const body = `New quote request from ShuttersDirectUSA Visualizer\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nSize: ${w}" × ${h}"\nArea: ${sqft} sq ft\nType: ${type}\nLouver: ${louver}\nColor: ${color}\nMount: ${mount}\n\nOur Price: $${our.toLocaleString()}\nRetail Price: $${retail.toLocaleString()}\nCustomer Saves: $${saves.toLocaleString()}\n\nMultiple windows: ${multi ? 'YES' : 'No'}\nSubmitted: ${new Date().toLocaleString()}`;
+    window.location.href = `mailto:${EMAIL_TO}?cc=${encodeURIComponent(EMAIL_CC + ',' + email)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    closeModal();
+    toast('Opening email as backup — hit Send to submit. 📧');
+  } finally {
+    submitBtn.textContent = 'Submit & Request My Quote →';
+    submitBtn.disabled = false;
+  }
 });
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+updateQuote(); // pre-calculate with default 36×48 values
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function toast(msg){
