@@ -893,32 +893,33 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
       submitted:    new Date().toLocaleString(),
     });
     // ── Also send to GoHighLevel to create/update contact ──
+    const ghlPayload = {
+      firstName:        name.split(' ')[0],
+      lastName:         name.split(' ').slice(1).join(' ') || '',
+      email:            email,
+      phone:            phone,
+      postalCode:       zip,
+      window_size:      w + '" × ' + h + '"',
+      window_area:      sqft + ' sq ft',
+      shutter_type:     type,
+      louver_size:      louver,
+      shutter_color:    color,
+      mount_type:       mount,
+      num_panels:       numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
+      our_price:        '$' + our.toLocaleString(),
+      retail_price:     '$' + retail.toLocaleString(),
+      customer_savings: '$' + saves.toLocaleString(),
+      multiple_windows: multi ? 'Yes' : 'No',
+      lead_source:      'ShuttersDirectUSA Visualizer',
+      submitted_at:     new Date().toISOString(),
+    };
+    // Use text/plain so no CORS preflight is needed — GHL receives the JSON body
     fetch(GHL_WEBHOOK, {
       method:  'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        firstName:    name.split(' ')[0],
-        lastName:     name.split(' ').slice(1).join(' ') || '',
-        email:        email,
-        phone:        phone,
-        postalCode:   zip,
-        // Window & order details as custom fields
-        window_size:       w + '" × ' + h + '"',
-        window_area:       sqft + ' sq ft',
-        shutter_type:      type,
-        louver_size:       louver,
-        shutter_color:     color,
-        mount_type:        mount,
-        num_panels:        numPanels + ' panel' + (numPanels > 1 ? 's' : ''),
-        our_price:         '$' + our.toLocaleString(),
-        retail_price:      '$' + retail.toLocaleString(),
-        customer_savings:  '$' + saves.toLocaleString(),
-        multiple_windows:  multi ? 'Yes' : 'No',
-        lead_source:       'ShuttersDirectUSA Visualizer',
-        submitted_at:      new Date().toISOString(),
-      }),
-      mode: 'no-cors',
-    }).catch(()=>{});  // silent fail — email already sent
+      headers: {'Content-Type': 'text/plain'},
+      body:    JSON.stringify(ghlPayload),
+      mode:    'no-cors',
+    }).catch(()=>{});
 
     closeModal();
     toast('Quote sent! We\'ll be in touch shortly. 🎉');
