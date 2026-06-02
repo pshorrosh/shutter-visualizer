@@ -913,12 +913,11 @@ document.getElementById('submitQuote').addEventListener('click', async () => {
       lead_source:      'ShuttersDirectUSA Visualizer',
       submitted_at:     new Date().toISOString(),
     };
-    // Use text/plain so no CORS preflight is needed — GHL receives the JSON body
+    // GHL supports CORS — send proper JSON
     fetch(GHL_WEBHOOK, {
       method:  'POST',
-      headers: {'Content-Type': 'text/plain'},
+      headers: {'Content-Type': 'application/json'},
       body:    JSON.stringify(ghlPayload),
-      mode:    'no-cors',
     }).catch(()=>{});
 
     closeModal();
