@@ -113,6 +113,11 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
 .pnum{width:24px;height:24px;border-radius:50%;background:#2d5a5a;color:#fff;font-size:.72em;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .install-note{margin-top:14px;font-size:.88em;background:#f0f8f4;border:1px solid #c8e6d4;border-radius:7px;padding:9px 12px;color:#1a3a3a;}
 
+/* Panel width warning */
+.panel-warn{display:none;background:#fff3e8;border:1px solid #f5a623;border-radius:8px;padding:10px 13px;font-size:.82em;color:#7a3d00;line-height:1.5;margin-bottom:12px;}
+.panel-warn.show{display:block;}
+.panel-warn strong{color:#5a2800;}
+
 .measure-guide{border-radius:9px;padding:13px 14px;margin-bottom:14px;font-size:.82em;line-height:1.6;}
 .measure-guide.inside{background:#eef6ff;border:1px solid #b3d4f5;}
 .measure-guide.outside{background:#fff3e8;border:1px solid #f5c894;}
@@ -198,9 +203,9 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
     <div class="ctrl-group" style="margin-bottom:14px;">
       <label for="louverSel">Louver Size</label>
       <select id="louverSel">
-        <option value="2.25">2.25&quot; &mdash; Modern &amp; Clean</option>
-        <option value="3.5" selected>3.5&quot; &mdash; Traditional</option>
-        <option value="4.5">4.5&quot; &mdash; Bold Statement</option>
+        <option value="2.5">2&frac12;&quot; &mdash; Modern &amp; Clean</option>
+        <option value="3.5" selected>3&frac12;&quot; &mdash; Traditional</option>
+        <option value="4.5">4&frac12;&quot; &mdash; Bold Statement</option>
       </select>
     </div>
 
@@ -235,6 +240,8 @@ input[type=number].field-err{border-color:#e74c3c !important;background:#fff8f8;
       </ul>
       <p class="mg-tip">&#128161; Tip: Inside mount gives a clean, built-in look and requires a minimum frame depth of 1&frac34;&rdquo;.</p>
     </div>
+
+    <div class="panel-warn" id="panelWarn"></div>
 
     <div class="ctrl-row">
       <div class="ctrl-group">
@@ -742,9 +749,35 @@ document.querySelectorAll('.panel-btn').forEach(btn => {
     document.querySelectorAll('.panel-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     numPanels = parseInt(btn.dataset.panels);
+    checkPanelWidthLimit();
     drawCanvas();
   });
 });
+
+// ─── Panel width limit validation ────────────────────────────────────────────
+function maxPanelWidth() {
+  return parseFloat(louverSel.value) <= 2.5 ? 24 : 30;
+}
+
+function checkPanelWidthLimit() {
+  const w       = parseFloat(wInput.value) || 0;
+  const maxW    = maxPanelWidth();
+  const panelW  = w > 0 ? (w / numPanels) : 0;
+  const warn    = document.getElementById('panelWarn');
+  const louver  = louverSel.options[louverSel.selectedIndex].text.split(' —')[0];
+
+  if (w > 0 && panelW > maxW) {
+    const minPanels = Math.ceil(w / maxW);
+    warn.innerHTML =
+      `&#9888;&#65039; <strong>Panel width limit exceeded.</strong> With ${louver} louvers, max panel width is ${maxW}". ` +
+      `Your current setup = ${panelW.toFixed(1)}" per panel. ` +
+      `Try <strong>${minPanels} panels</strong> to stay within spec.`;
+    warn.classList.add('show');
+    return false;
+  }
+  warn.classList.remove('show');
+  return true;
+}
 
 // ─── Preferences → redraw ─────────────────────────────────────────────────────
 document.querySelectorAll('.color-swatch').forEach(sw => {
@@ -753,7 +786,8 @@ document.querySelectorAll('.color-swatch').forEach(sw => {
     sw.classList.add('sel'); shutterColor = sw.dataset.color; drawCanvas();
   });
 });
-[shutterSel, louverSel, mountSel].forEach(el => el.addEventListener('change', () => drawCanvas()));
+[shutterSel, mountSel].forEach(el => el.addEventListener('change', () => drawCanvas()));
+louverSel.addEventListener('change', () => { checkPanelWidthLimit(); drawCanvas(); });
 
 // ─── Measurement guide ────────────────────────────────────────────────────────
 const GUIDE = {
@@ -772,6 +806,7 @@ mountSel.addEventListener('change', updateMeasureGuide);
   el.addEventListener('input', () => {
     el.classList.remove('field-err');
     (el===wInput?wErr:hErr).classList.remove('show');
+    if (el === wInput) checkPanelWidthLimit();
     if (overlay) { refreshOverlayAspect(); drawCanvas(); }
     if (quoteSection.style.display!=='none') updateQuote();
   });
@@ -786,6 +821,11 @@ estimateBtn.addEventListener('click', () => {
   if(!w||w<6){wInput.classList.add('field-err');wErr.classList.add('show');ok=false;}
   if(!h||h<6){hInput.classList.add('field-err');hErr.classList.add('show');ok=false;}
   if(!ok){toast('Please enter your window measurements first.');wInput.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  if(!checkPanelWidthLimit()){
+    toast('Panel width exceeds the limit for your louver selection. Adjust panels or width.');
+    document.getElementById('panelWarn').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
   updateQuote();
   quoteSection.style.display='block';
   setTimeout(()=>quoteSection.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
