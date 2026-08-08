@@ -131,3 +131,117 @@ The JS is organized with section-marker comments in the form `─── Section 
 13. Reload the page — the "Continue your last visualization?" banner should appear; pick "Yes, restore" — including the tilt slider position.
 14. Resize the browser to under 820px wide — layout switches to single column, corners scale proportionally.
 15. On mobile: confirm touch events work for corner placement (with loupe), slider drag, tilt drag, and modal interaction. Numeric keyboards should appear on Width/Height/ZIP inputs.
+
+---
+
+## Context Audit Procedure
+
+A standing procedure for periodically auditing everything that loads into an
+agent's context automatically at the start of a session, to keep session-start
+context lean and accurate. Run this when asked to "audit context" or
+"clean up CLAUDE.md," not as part of ordinary feature work.
+
+### Scope
+
+Every file that loads into an agent's context automatically or by convention at
+the start of a session. Find them before you plan. Look for CLAUDE.md and any
+nested CLAUDE.md files, AGENTS.md, README sections written for agents rather
+than humans, .cursorrules, .github/copilot-instructions.md, and any skills,
+rules, or hook directories. Also find anything those files instruct the reader
+to load up front, because that counts as session-start context too.
+
+### Step 1: measure before changing anything
+
+Report the byte count of every file loaded at session start, and the total.
+Estimate what that costs in tokens. State it plainly. This is the number the
+whole exercise moves, so I want it before and after.
+
+### Step 2: audit against the article
+
+For each file, identify:
+
+1. FRONT-LOADED REFERENCE. Schema tables, API rate limits, exhaustive file
+   inventories, past-bug lists, runbook detail, long CI/CD catalogs. Anything
+   relevant to a subset of tasks but loaded for all of them.
+
+2. DUPLICATION. Rules restated across two or more files. Note which copy is
+   more accurate, because they have usually drifted apart.
+
+3. OVERCONSTRAINED GUIDANCE. Rigid procedural rules a current model handles
+   better by judgment, and rules that now contradict the harness's own system
+   prompt. Check specifically for "re-read the file after every edit to confirm
+   it applied." The edit tools error on a failed write, and the current Claude
+   Code system prompt tells the model not to re-read for that reason, so this
+   instruction is now a net negative. Also look for instructions that forbid
+   something the model no longer does by default, since those just spend
+   attention.
+
+4. STALE OR CONTRADICTORY CLAIMS. Two files disagreeing on a fact, or a rule
+   describing code that has since changed. Verify against the actual code
+   before trusting either version.
+
+5. OBVIOUS-FROM-STRUCTURE CONTENT. Anything the model would learn faster by
+   listing the directory than by reading a description of it.
+
+### Step 3: restructure
+
+- The main instruction file becomes lightweight: what this repo is, the handful
+  of genuine gotchas, the rules that must not be broken, and an index of what
+  to load on demand. Aim for something a new human hire would actually read.
+
+- Move reference material into a docs directory as topic files. Index them in a
+  table that says WHEN to read each one, not just that it exists. Move it. Do
+  not delete it.
+
+- Give every rule exactly one canonical home. Where another file needs it,
+  link, do not restate.
+
+- Where two files disagreed, verify against the code and fix the wrong one.
+
+- Favor pointing at real artifacts over describing them. A link to the actual
+  config, test, or type definition beats a paragraph summarizing it, and it
+  cannot go stale the same way.
+
+### Step 4: what NOT to cut
+
+Be conservative. Keep inline, in full, anything where getting it wrong causes
+real damage:
+
+- Rules that already caused an incident, and say so, because the incident is
+  what makes the rule credible.
+- Security, auth, permissions, and allowlist rules.
+- Anything a hook, CI check, or lint rule mechanically enforces. If you reword
+  it, confirm the enforcement still matches.
+- Gates on destructive actions and on human approval.
+- Explicit stated preferences about output format or workflow, even fussy ones.
+  Those are the owner's call, not a style question.
+
+If you think one of these should go, raise it with the repo owner instead of
+removing it.
+
+### Step 5: verify
+
+- Run whatever lint, format, link, or content checks the repo has over the new
+  and moved files. Report the real output, not a claim that it passed.
+- Confirm nothing broke: section anchors other files link to, relative paths
+  inside moved content, and any script or hook that greps these files by name
+  or heading.
+- Read the seams where you split or spliced content, not just the diff stat.
+- Re-report the session-start byte total, before and after.
+
+### Step 6: report
+
+Show a summary containing:
+- Before and after size numbers.
+- A table of what moved where.
+- Every stale or contradictory thing found, and how it was resolved.
+- Anything deliberately left alone, and why.
+
+Then stop and let the repo owner review before committing anything.
+
+### Ground rules
+
+Do not water down a rule to make a file shorter. The goal is that the right
+context arrives at the right time, not that the files are small. If a section is
+long because the underlying thing is genuinely complicated, it stays long. It
+just stops being loaded for every task. Ask before removing anything unclear.
