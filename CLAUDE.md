@@ -1,8 +1,13 @@
 # ShutterViz — CLAUDE.md
 
-Customer-facing shutter visualizer for ShuttersDirectUSA. Customers upload (or snap) a window photo, mark 4 corners with magnified precision, then see perspective-correct previews of shutters with live pricing, before/after compare, adjustable louver tilt, save/share, and printable quotes.
+Customer-facing shutter visualizer for ShuttersDirectUSA. Customers upload a
+window photo, drag a 4-corner overlay to fit their window (dragging a single
+corner skews it for perspective), then see a live shutter preview with
+pricing, a before/after toggle, and a quote-request flow that posts to
+GoHighLevel and sends an email confirmation.
 
-**Single file. Zero dependencies. No build step.**
+**Single file. No build step.** ⚠️ Not fully zero-dependency: `index.html:7`
+loads the EmailJS SDK from a CDN — see **Known TODOs** below.
 
 ---
 
@@ -18,13 +23,13 @@ open index.html
 
 ## Architecture
 
-Everything lives in one file: `index.html` (~1580 lines).
+Everything lives in one file: `index.html` (999 lines).
 
 | Block | Lines |
 |---|---|
-| CSS (`<style>`) | 7–166 |
-| HTML structure | 168–392 |
-| JavaScript (`<script>`) | 394–1576 |
+| CSS (`<style>`) | 8–134 |
+| HTML structure | 136–349 |
+| JavaScript (`<script>`) | 350–997 |
 
 The JS is organized with section-marker comments in the form `─── Section Name ───`. Never remove or rename these markers — they are the navigation system.
 
@@ -34,100 +39,84 @@ The JS is organized with section-marker comments in the form `─── Section 
 
 | Section | Lines | Notes |
 |---|---|---|
-| `─── DOM refs ───` | 395 | All element references, including modal, preview-actions, camera, tilt, and loupe |
-| `─── State ───` | 439 | `img`, `corners`, `vizMode`, `shutterColor`, `sliderX/Active`, `louverTilt`, `GHL_WEBHOOK`, `STORAGE_KEY` |
-| `─── Storage ───` | 469 | `saveToStorage()`, `loadFromStorage()`, `hasStored()` — corners stored normalised, includes `tilt` |
-| `─── Upload ───` | 532 | File drop + `loadFile()` (downsamples to max 1400px at line 549) + **camera-capture input** wiring. Bug fix: display:block before sizeCanvas via rAF |
-| `─── Coordinate helpers ───` | 590 | `canvasCoords`, `dist`, `nearestCorner`, `nearSlider`, `lerpPt` |
-| `─── Magnifier loupe ───` | 613 | `showLoupe(pt)` renders a 3× zoomed circle near touch point with crosshair; `hideLoupe()` on release |
-| `─── Louver tilt label ───` | 649 | `updateTiltLabel()` maps the 0–100 slider to text (Fully Closed → Wide Open) |
-| `─── Pointer events ───` | 661 | Touch & mouse handlers. Slider drag wins over corners. New placements auto-enter drag mode for fine-tune with loupe |
-| `─── Corner status UI ───` | 740 | Dot indicators, hint text, **undo button** |
-| `─── Dimension estimation ───` | 759 | Heuristic px-to-inch mapping; calibration table inside `estimateDimensions()` |
-| `─── Perspective warp ───` | 785 | `drawTexturedTriangle()`, `warpToQuad(src, quad, c, fast)`. Grid at line 815 (`N = fast ? 6 : 12`) — coarser during interactive drag, crisp on release |
-| `─── Off-screen shutter render ───` | 849 | `renderShuttersOffscreen()` — rebuilds shutter texture when `shutterDirty=true`. `PIXEL_PER_INCH` at line 859 |
-| `─── Draw ───` | 887 | `drawCanvas(fast)` → `drawMarkup()` / `drawPreview(fast)` → `warpToQuad()`; `drawDimensionLabels()` overlays W/H |
-| `─── Before/After slider ───` | 1018 | `drawSlider()`, toggle-button handler, `setSmartSliderPosition()` (places divider opposite the window) |
-| `─── Shutter rendering ───` | 1081 | `lv()`, `drawPlantationPanel()` (uses `louverTilt` for `openFrac` at line 1125), `drawArchPanel()`, `drawSunburstPanel()` |
-| `─── Mode toggle ───` | 1262 | Markup / Preview tab buttons; shows the Save/Share/Compare action bar in preview |
-| `─── Color picker ───` | 1278 | Swatch selection → `shutterColor`, marks shutter dirty |
-| `─── Live quote ───` | 1290 | `updateQuote()` — $29/sq ft at line 1295; tilt slider listener also lives here |
-| `─── Save & Share ───` | 1326 | `buildExportCanvas()` (with branding strip), save-as-PNG, Web Share API with download fallback |
-| `─── Print quote ───` | 1405 | `fillPrintSheet()` populates `#printSheet` and `window.print()` |
-| `─── Contact modal ───` | 1436 | `openContactModal()`, validates name + email, posts GHL webhook with contact info |
-| `─── Reset ───` | 1502 | `doReset()` clears all state + localStorage; `Clear Markers` keeps the photo |
-| `─── Toast helper ───` | 1534 | `toast(msg)` — 3.2s bottom notification |
-| `─── Window resize ───` | 1541 | Debounced (120ms); scales corners proportionally to new canvas size |
-| `─── Restore-on-load prompt ───` | 1558 | "Continue your last visualization?" banner if localStorage has state |
-| `─── Init ───` | 1571 | Initial `updateCornerStatus()`, `updateQuote()`, `updateTiltLabel()` |
+| `─── DOM refs ───` | 351 | Canvas/ctx, upload elements, width/height/select inputs, quote elements, modal |
+| `─── State ───` | 373 | `img`, `overlay` (the 4-corner quad), `showShutters`, `action`/`dragStart` (corner-drag state), `shutterColor`, `numPanels`, `EMAIL_TO`/`EMAIL_CC` |
+| `─── Upload ───` | 387 | Drag-and-drop + click upload, `loadFile()` downsamples to max 1400px, then centers the starting overlay via `initOverlay()` |
+| `─── Overlay (free-form quad) ───` | 425 | `overlayAspect()`, `initOverlay()`, `refreshOverlayAspect()`, `pointInQuad()`, `hitTest()` — the draggable 4-corner quad; appears automatically on upload, no separate "mark corners" step |
+| `─── Coordinate helper ───` | 472 | `canvasCoords()` — client px → canvas px |
+| `─── Pointer events ───` | 478 | Touch + mouse handlers for dragging the whole overlay or a single corner |
+| `─── Before / After toggle ───` | 523 | `btnAfter`/`btnBefore` click handlers — a simple show/hide toggle, not a drag divider |
+| `─── Quad geometry helpers ───` | 537 | `lerp2`, `qpt`, `qpath`, `qvgrad`, `expandQuad` — bilinear interpolation across the quad, used by every panel-drawing function |
+| `─── Draw ───` | 561 | `drawCanvas()` — draws the photo, clips to the quad (expanded for outside mount), calls the panel drawer per panel, then draws the outline + corner handles |
+| `─── Shutter rendering (perspective-aware quad versions) ───` | 607 | `lv()` (lighten/darken a hex color), `drawPlantationPanel()`, `drawArchPanel()`, `drawSunburstPanel()` — draw straight onto the visible canvas via the quad helpers; no off-screen texture or cache |
+| `─── Panel count buttons ───` | 746 | `.panel-btn` click handlers set `numPanels`, re-validate, redraw |
+| `─── Panel width limit validation ───` | 757 | `maxPanelWidth()` (24″ for louvers ≤2.5″, else 30″), `checkPanelWidthLimit()` — shows `#panelWarn` when exceeded |
+| `─── Preferences → redraw ───` | 782 | Color-swatch clicks, shutter/mount/louver `change` listeners — all trigger `drawCanvas()` |
+| `─── Measurement guide ───` | 792 | `GUIDE` object + `updateMeasureGuide()` — swaps inside/outside "How to Measure" instructions |
+| `─── Measurement inputs ───` | 804 | Width/height `input` listeners — clear errors, re-check panel width, refresh overlay aspect, live-update the quote if visible |
+| `─── Estimate ───` | 815 | `estimateBtn` handler validates inputs + panel width, then calls `updateQuote()` ($29/sq ft vs $49/sq ft retail) |
+| `─── Reset ───` | 847 | `doReset()` clears photo/overlay/inputs/quote section; wired to both `resetBtn` and `startOverBtn` |
+| `─── Quote modal ───` | 863 | `quoteBtn` opens the modal with a summary + price; `closeModal()` on × or overlay click |
+| `─── GoHighLevel webhook ───` | 881 | `GHL_WEBHOOK` — live LeadConnector URL |
+| `─── EmailJS config ───` | 884 | `EMAILJS_PUBLIC_KEY`/`EMAILJS_SERVICE_ID`/`EMAILJS_TEMPLATE_ID` |
+| `─── Submit quote → auto-send via EmailJS ───` | 889 | Validates contact fields, posts the lead to `GHL_WEBHOOK`, sends the EmailJS confirmation, closes the modal, shows a toast |
+| `─── Init ───` | 972 | `emailjs.init()`, pre-computes the default quote |
+| `─── Toast ───` | 976 | `toast(msg)` — bottom notification |
+| `─── Resize ───` | 983 | Debounced (120ms) canvas resize that rescales the overlay's corner coordinates proportionally |
 
 ---
 
 ## Common tasks
 
-**Change the price per sq ft** → line 1295 (`sqft * 29` in `updateQuote()`). The contact modal and print sheet derive from `updateQuote`, so this is the single source of truth.
+**Change the price per sq ft** → computed independently in three places, all using `* 29` (cost) / `* 49` (retail): `updateQuote()` (line 837), the quote-modal handler (line 866), and the submit handler (line 900). Change all three together — there's no single source of truth here.
 
-**Change available colors** → HTML lines 297–302 (color swatches with `data-color` hex values)
+**Change available colors** → `.color-swatch` divs, HTML lines 215–220 (`data-color` hex values)
 
-**Change shutter types** → HTML lines 273–277 (`<select id="shutterSel">`)
+**Change shutter types** → `<select id="shutterSel">`, HTML lines 186–190
 
-**Change louver sizes** → HTML lines 282–286 (`<select id="louverSel">`)
+**Change louver sizes** → `<select id="louverSel">`, HTML lines 205–209
 
-**Change panel-count options** → HTML lines 256–262 (`<select id="panelSel">`)
+**Change panel-count options** → `.panel-btn` buttons inside `#panelBtns`, HTML lines 196–199 (buttons, not a `<select>`)
 
-**Change louver-tilt slider** (range, default) → HTML line 291 (`<input id="tiltInput">`) and JS default at line 442 (`let louverTilt = 0.32`)
+**Change the panel-width limit** → `maxPanelWidth()` (~line 758): 24″ for louvers ≤2.5″, 30″ otherwise
 
-**Tweak how shutters look** → `drawPlantationPanel` (~line 1092), `drawArchPanel`, `drawSunburstPanel` — all render onto the off-screen canvas, then `warpToQuad()` (785) maps the texture onto the marked quad.
+**Tweak how shutters look** → `drawPlantationPanel()` (615), `drawArchPanel()` (691), `drawSunburstPanel()` (711) — draw directly onto the visible canvas using the quad helpers (`qpt`/`qpath`/`qvgrad`, line 537)
 
-**Improve perspective warp quality** → grid resolution in `warpToQuad()` line 815 (`N = fast ? 6 : 12`). Bump 12 → 16 for smoother, slower; bump 6 → 8 for crisper drags.
+**Change the inside/outside measuring instructions** → `GUIDE` object (~line 793)
 
-**Change dimension estimation heuristics** → `estimateDimensions()` (~line 765); calibration table inside that function
+**GHL webhook / EmailJS notification** → both live, wired in the submit-quote handler (~line 890). `GHL_WEBHOOK` (~line 882) posts the full lead payload (name, contact info, dimensions, shutter type/color/mount, pricing) to GoHighLevel; `EMAILJS_*` config (~line 885) plus `EMAIL_TO`/`EMAIL_CC` (~line 384) send a parallel confirmation email. Change recipients at `EMAIL_TO`/`EMAIL_CC`, not in the handler itself.
 
-**Wire up GHL webhook** → line 462, replace `'https://YOUR-GHL-WEBHOOK-URL-HERE'` with the real URL. Payload (name, email, phone, zip, panels, dims, etc.) is built in the modal-submit handler
+**Edit the "what happens next" copy / trust badges** → trust badges at HTML lines 290–294, the 5-step process list + install phone number at lines 325–334
 
-**Tweak the export image** (saved/shared/printed) → `buildExportCanvas()` (~line 1328) — change branding strip text/size/position there.
-
-**Change print layout** → `#printSheet` HTML and the `@media print` CSS
-
-**Responsive layout breakpoint** → CSS line 21 (`max-width:820px` → single column)
-
-**Magnifier loupe** (size, zoom) → `LOUPE_R` and `LOUPE_ZOOM` constants in State section (line ~447), plus `showLoupe()` at line 615 and the `#loupe` CSS rule
+**Responsive layout breakpoint** → CSS line 20 (`@media(max-width:820px)` → single column)
 
 ---
 
 ## Code style
 
 - **Match the existing style exactly.** Section-marker comments (`─── Name ───`), camelCase variables, descriptive names, the same gradient/shading idiom used by the shutter draw functions.
-- No external libraries or CDN imports — must remain zero-dependency.
 - No build tooling — the file must stay a single deployable `.html`.
 - Do not break mobile/touch support. All pointer interactions use both mouse and touch event handlers.
-- The off-screen shutter canvas is cached — set `shutterDirty = true` (or call `markShutterDirty()`) whenever shutter style/color/dimensions/panels change so the cache rebuilds.
-- Corners stored as canvas pixels at runtime; **normalised to [0,1]** for localStorage so they survive screen-width changes. Convert back on load via `c.x * canvas.width`.
 - Prefer editing in-place. Do not restructure the file layout or rename sections.
 
 ---
 
 ## Known TODOs
 
-- **GHL webhook** (line 429): URL is a placeholder — `'https://YOUR-GHL-WEBHOOK-URL-HERE'`. Do not treat it as live. The contact-modal submission depends on it.
-- **Deployment**: Method is TBD. Do not add GitHub Pages, Netlify, or any hosting config without asking first.
+- **Zero-dependency claim is currently false**: `index.html:7` loads the EmailJS SDK from `cdn.jsdelivr.net`, which the quote-confirmation email (Known Sections → EmailJS config / Submit quote) depends on. Don't remove that `<script>` tag as a "zero-dependency cleanup" — that would break lead-confirmation email. If true zero-dependency matters more than the EmailJS confirmation email, that's a product decision for the repo owner, not something to resolve unilaterally.
+- **Deployment**: Vercel is already connected via GitHub integration and auto-deploys previews + production on every push (no `vercel.json` committed — it's configured on the Vercel side). Don't add a separate GitHub Pages/Netlify config, or commit a `vercel.json`, without asking first.
 
 ---
 
 ## Testing
 
-1. Open `index.html` in Chrome or Safari.
-2. Upload a window photo (drag-and-drop or click). **Photo must render immediately** — no scrolling required.
-3. On a phone, the **Take Photo** button should appear under the drop zone and launch the rear camera.
-4. Mark all 4 corners in order: top-left → top-right → bottom-right → bottom-left. While placing/dragging each corner, the **magnifier loupe** appears with a yellow crosshair at the exact placement. Try Undo and Clear.
-5. Switch to "See Shutters". Verify shutters follow the **perspective** of the marked quad (not flat-rectangle pasted on top).
-6. Drag the BEFORE / AFTER divider left/right; toggle the Compare button to hide/show the slider. The slider should auto-position **opposite the window** on first enter.
-7. Drag the **Louver Tilt** slider — see blades open/close in real time, label updates Fully Closed → Wide Open.
-8. Cycle through all 3 shutter types, 3 louver sizes, 4 panel counts, 6 colors. Switch between Inside and Outside mount.
-9. Click **Save Image** — a PNG with the branding strip should download.
-10. Click **Share** — on mobile, the native share sheet should open; on desktop, the image downloads.
-11. Click **Get Full Quote** — modal opens, requires name + email, posts to GHL webhook.
-12. Click **Print this quote** — print dialog opens with a formatted quote sheet.
-13. Reload the page — the "Continue your last visualization?" banner should appear; pick "Yes, restore" — including the tilt slider position.
-14. Resize the browser to under 820px wide — layout switches to single column, corners scale proportionally.
-15. On mobile: confirm touch events work for corner placement (with loupe), slider drag, tilt drag, and modal interaction. Numeric keyboards should appear on Width/Height/ZIP inputs.
+See [`docs/testing.md`](docs/testing.md) for the manual QA checklist — read it before merging any change that touches drawing, pricing, the quote flow, or layout.
+
+---
+
+## Context audit
+
+For periodically auditing everything that loads into an agent's context at
+session start (this file, skills, etc.) and trimming what's front-loaded but
+rarely relevant — run the `context-audit` skill (`.claude/skills/context-audit/`).
+Don't restate that procedure here; it has one home.
