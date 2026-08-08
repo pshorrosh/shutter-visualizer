@@ -83,7 +83,7 @@ The JS is organized with section-marker comments in the form `─── Section 
 
 **Change dimension estimation heuristics** → `estimateDimensions()` (~line 765); calibration table inside that function
 
-**Wire up GHL webhook** → line 462, replace `'https://YOUR-GHL-WEBHOOK-URL-HERE'` with the real URL. Payload (name, email, phone, zip, panels, dims, etc.) is built in the modal-submit handler
+**GHL webhook / EmailJS notification** → both live, wired in the submit-quote handler (~line 890). `GHL_WEBHOOK` (~line 882) posts the full lead payload (name, contact info, dimensions, shutter type/color/mount, pricing) to GoHighLevel; `EMAILJS_*` config (~line 885) plus `EMAIL_TO`/`EMAIL_CC` (~line 384) send a parallel confirmation email. Change recipients at `EMAIL_TO`/`EMAIL_CC`, not in the handler itself.
 
 **Tweak the export image** (saved/shared/printed) → `buildExportCanvas()` (~line 1328) — change branding strip text/size/position there.
 
@@ -109,7 +109,6 @@ The JS is organized with section-marker comments in the form `─── Section 
 
 ## Known TODOs
 
-- **GHL webhook** (line 429): URL is a placeholder — `'https://YOUR-GHL-WEBHOOK-URL-HERE'`. Do not treat it as live. The contact-modal submission depends on it.
 - **Deployment**: Method is TBD. Do not add GitHub Pages, Netlify, or any hosting config without asking first.
 
 ---
